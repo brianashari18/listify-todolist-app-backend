@@ -1,0 +1,27 @@
+{
+  "name": "listify-todolist-app-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brianashari18/listify-todolist-app-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brianashari18/listify-todolist-app-backend/issues"
+  },
+  "type": "module",
+  "homepage": "https://github.com/brianashari18/listify-todolist-app-backend#readme",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  }
+}
