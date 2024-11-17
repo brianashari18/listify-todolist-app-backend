@@ -22,8 +22,7 @@ const register = async (request) => {
         data : user,
         select: {
             id: true,
-            email: true,
-            name: true,
+            email: true
         }
     })
 

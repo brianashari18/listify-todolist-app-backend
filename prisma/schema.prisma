@@ -15,7 +15,6 @@ datasource db {
 
 model User {
   id             String          @id @default(uuid()) // Adjust to your DB requirements if needed (e.g., Int, AutoIncrement, etc.)
-  name           String          @db.VarChar(100)
   email          String          @unique @db.VarChar(100)
   password       String          @db.VarChar(100)
   token          String?         @db.VarChar(100)

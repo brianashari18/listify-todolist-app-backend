@@ -18,13 +18,12 @@ describe('POST /api/users', function () {
                 id: 'test',
                 email: 'test@test.com',
                 password: 'rahasia',
-                name: 'test'
+
             });
 
         expect(result.status).toBe(200);
         expect(result.body.data.id).toBe("test");
         expect(result.body.data.email).toBe("test@test.com");
-        expect(result.body.data.name).toBe("test");
         expect(result.body.data.password).toBeUndefined();
     });
 })
