@@ -64,7 +64,7 @@ model SubTask {
 model UserWorkspace {
   username     String
   workspaceId  Int
-  accessRights Int
+  accessRights Int       @default(1) // 1 : view, 2 : edit, default 1
   user         User      @relation(fields: [username], references: [username])
   workspace    Workspace @relation(fields: [workspaceId], references: [id])
 
