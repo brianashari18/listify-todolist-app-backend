@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Task Management API",
+    "title": "Listify Todolist App API",
     "version": "1.0.0",
     "description": "API for managing users, tasks, subtasks, and workspaces."
   },
@@ -108,6 +108,181 @@
           ]
         }
       },
+      "AddUpdateTaskRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Test Task" },
+          "color": { "type": "string", "example": "blue" },
+          "isShared": { "type": "boolean", "example": true }
+        }
+      },
+      "TaskDataResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer", "example": 1 },
+              "name": { "type": "string", "example": "Test Task" },
+              "color": { "type": "string", "example": "blue" },
+              "isShared": { "type": "boolean", "example": true },
+              "userId": { "type": "string", "example": "test_user" },
+              "workspaceId": { "type": "integer", "example": 1 }
+            }
+          }
+        }
+      },
+      "ManyTaskDataResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer", "example": 1 },
+                "name": { "type": "string", "example": "Test Task" },
+                "color": { "type": "string", "example": "blue" },
+                "isShared": { "type": "boolean", "example": true },
+                "userId": { "type": "string", "example": "test_user" },
+                "workspaceId": { "type": "integer", "example": 1 }
+              }
+            }
+          }
+        },
+        "example": {
+          "code": 200,
+          "status": "OK",
+          "data": [
+            {
+              "id": 1,
+              "name": "test",
+              "color": "blue",
+              "isShared": true,
+              "userId": "test",
+              "workspaceId": 1
+            },
+            {
+              "id": 2,
+              "name": "test",
+              "color": "blue",
+              "isShared": true,
+              "userId": "test",
+              "workspaceId": 1
+            },
+            {
+              "id": 2,
+              "name": "test",
+              "color": "blue",
+              "isShared": true,
+              "userId": "test",
+              "workspaceId": 1
+            }
+          ]
+        }
+      },
+      "AddUpdateSubTaskRequest": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "taskData": { "type": "string", "example": "Complete API documentation" },
+          "deadline": { "type": "string", "format": "date-time", "example": "2024-01-01T12:00:00Z" },
+          "status": { "type": "integer", "example": 0 },
+          "taskId": { "type": "integer", "example": 10 }
+        }
+      },
+      "SubTaskDataResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer", "example": 1 },
+              "taskData": { "type": "string", "example": "Complete API documentation" },
+              "deadline": { "type": "string", "format": "date-time", "example": "2024-01-01T12:00:00Z" },
+              "status": { "type": "integer", "example": 0 },
+              "taskId": { "type": "integer", "example": 10 }
+            }
+          }
+        }
+      },
+      "ManySubTaskDataResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer", "example": 1 },
+                "taskData": { "type": "string", "example": "Complete API documentation" },
+                "deadline": { "type": "string", "format": "date-time", "example": "2024-01-01T12:00:00Z" },
+                "status": { "type": "integer", "example": 0 },
+                "taskId": { "type": "integer", "example": 10 }
+              }
+            }
+          }
+        },
+        "example": {
+          "code": 200,
+          "status": "OK",
+          "data": [
+            {
+              "id": 1,
+              "taskData": "Complete API documentation",
+              "deadline": "2024-01-01T12:00:00Z",
+              "status": 0,
+              "taskId": 10
+            },
+            {
+              "id": 2,
+              "taskData": "Review API implementation",
+              "deadline": "2024-01-02T12:00:00Z",
+              "status": 1,
+              "taskId": 10
+            },
+            {
+              "id": 3,
+              "taskData": "Fix API endpoint bugs",
+              "deadline": "2024-01-03T12:00:00Z",
+              "status": 0,
+              "taskId": 11
+            }
+          ]
+        }
+      },
       "TokenResponse": {
         "type": "object",
         "properties": {
@@ -152,25 +327,6 @@
             "example": "BAD REQUEST"
           },
           "errors": { "type": "string", "example": "Detailed error message" }
-        }
-      },
-      "Task": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "example": 1 },
-          "name": { "type": "string", "example": "Test Task" },
-          "color": { "type": "string", "example": "blue" },
-          "isShared": { "type": "boolean", "example": true },
-          "userId": { "type": "string", "example": "test_user" },
-          "workspaceId": { "type": "integer", "example": 1 }
-        }
-      },
-      "Workspace": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "example": 1 },
-          "name": { "type": "string", "example": "Development Workspace" },
-          "userId": { "type": "string", "example": "test_user" }
         }
       }
     },
@@ -562,7 +718,7 @@
     },
     "/api/tasks": {
       "get": {
-        "tags": ["Admin"],
+        "tags": ["Task"],
         "summary": "Retrieve All Tasks",
         "security": [{ "BearerAuth": [] }],
         "responses": {
@@ -572,7 +728,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/Task" }
+                  "items": { "$ref": "#/components/schemas/ManyTaskDataResponse" }
                 }
               }
             }
@@ -587,29 +743,29 @@
           }
         }
       },
-      "delete": {
-        "tags": ["Admin"],
-        "summary": "Delete All Tasks",
+      "post": {
+        "tags": ["Task"],
+        "summary": "Create a New Task",
         "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AddUpdateTaskRequest" }
+            }
+          }
+        },
         "responses": {
-          "200": {
-            "description": "All tasks deleted successfully",
+          "201": {
+            "description": "Task created successfully",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/DeleteMessageResponse" }
+                "schema": { "$ref": "#/components/schemas/TaskDataResponse" }
               }
             }
           },
-          "401": {
-            "description": "Unauthorized access",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
+          "400": {
+            "description": "Invalid task data",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/ErrorResponse" }
@@ -621,7 +777,7 @@
     },
     "/api/tasks/{taskId}": {
       "get": {
-        "tags": ["Admin"],
+        "tags": ["Task"],
         "summary": "Retrieve Task by ID",
         "security": [{ "BearerAuth": [] }],
         "parameters": [
@@ -638,7 +794,7 @@
             "description": "Task retrieved successfully",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Task" }
+                "schema": { "$ref": "#/components/schemas/TaskDataResponse" }
               }
             }
           },
@@ -653,7 +809,7 @@
         }
       },
       "patch": {
-        "tags": ["Admin"],
+        "tags": ["Task"],
         "summary": "Update Task by ID",
         "security": [{ "BearerAuth": [] }],
         "parameters": [
@@ -669,7 +825,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/Task" }
+              "schema": { "$ref": "#/components/schemas/AddUpdateTaskRequest" }
             }
           }
         },
@@ -678,7 +834,7 @@
             "description": "Task updated successfully",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Task" }
+                "schema": { "$ref": "#/components/schemas/TaskDataResponse" }
               }
             }
           },
@@ -701,7 +857,7 @@
         }
       },
       "delete": {
-        "tags": ["Admin"],
+        "tags": ["Task"],
         "summary": "Delete Task by ID",
         "security": [{ "BearerAuth": [] }],
         "parameters": [
@@ -724,6 +880,234 @@
           },
           "404": {
             "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{taskId}/subtask": {
+      "get": {
+        "tags": ["SubTask"],
+        "summary": "Retrieve All SubTasks for a Task",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task whose subtasks to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all subtasks retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/SubTaskDataResponse" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["SubTask"],
+        "summary": "Create a New SubTask for a Task",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to which the subtask belongs"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AddUpdateSubTaskRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "SubTask created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubTaskDataResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid subtask data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{taskId}/subtask/{subTaskId}": {
+      "get": {
+        "tags": ["SubTask"],
+        "summary": "Retrieve SubTask by ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to which the subtask belongs"
+          },
+          {
+            "name": "subTaskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the subtask to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SubTask retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubTaskDataResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "SubTask not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["SubTask"],
+        "summary": "Update SubTask by ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to which the subtask belongs"
+          },
+          {
+            "name": "subTaskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the subtask to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AddUpdateSubTaskRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "SubTask updated successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubTaskDataResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid subtask data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "SubTask not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["SubTask"],
+        "summary": "Delete SubTask by ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to which the subtask belongs"
+          },
+          {
+            "name": "subTaskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the subtask to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SubTask deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeleteMessageResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "SubTask not found",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/ErrorResponse" }
