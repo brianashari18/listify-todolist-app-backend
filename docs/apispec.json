@@ -57,8 +57,7 @@
             "type": "object",
             "properties": {
               "username": { "type": "string", "example": "test_user" },
-              "email": { "type": "string", "example": "test@example.com" },
-              "password": { "type": "string", "example": "securepassword" }
+              "email": { "type": "string", "example": "test@example.com" }
             }
           }
         }
@@ -80,8 +79,7 @@
               "type": "object",
               "properties": {
                 "username": { "type": "string", "example": "test_user" },
-                "email": { "type": "string", "example": "test@example.com" },
-                "password": { "type": "string", "example": "securepassword" }
+                "email": { "type": "string", "example": "test@example.com" }
               }
             }
           }
@@ -92,18 +90,15 @@
           "data": [
             {
               "username": "john_doe",
-              "email": "john.doe@example.com",
-              "password": "securepassword123"
+              "email": "john.doe@example.com"
             },
             {
               "username": "jane_smith",
-              "email": "jane.smith@example.com",
-              "password": "mypassword789"
+              "email": "jane.smith@example.com"
             },
             {
               "username": "alice_wonder",
-              "email": "alice.wonder@example.com",
-              "password": "password456"
+              "email": "alice.wonder@example.com"
             }
           ]
         }
@@ -410,6 +405,110 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/forgot-password": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Send password reset instructions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "test@example.com" }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset instructions sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 200 },
+                    "status": { "type": "string", "example": "OK" },
+                    "message": {
+                      "type": "string",
+                      "example": "Password reset instructions sent to your email"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/reset-password": {
+      "post": {
+        "tags": ["User"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Reset user password",
+        "parameters": [
+          { "$ref": "#/components/parameters/BearerAuthorizationHeader"}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newPassword": { "type": "string", "example": "newSecurePassword123" }
+                },
+                "required": ["newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 200 },
+                    "status": { "type": "string", "example": "OK" },
+                    "message": {
+                      "type": "string",
+                      "example": "Password has been reset successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid token or password",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
               }
             }
           }
