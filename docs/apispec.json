@@ -1,0 +1,1220 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Listify Todolist App API",
+    "version": "1.0.0",
+    "description": "API for managing users, tasks, subtasks, and workspaces."
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY"
+      }
+    },
+    "schemas": {
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string", "example": "test_user" },
+          "email": { "type": "string", "example": "test@example.com" },
+          "password": { "type": "string", "example": "securepassword" }
+        },
+        "required": ["username", "email", "password"]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "example": "test@example.com" },
+          "password": { "type": "string", "example": "securepassword" }
+        },
+        "required": ["email", "password"]
+      },
+      "UserUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "maxLength": 100, "example": "test@example.com" },
+          "password": { "type": "string", "example": "test" }
+        }
+      },
+      "UserDataResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "username": { "type": "string", "example": "test_user" },
+              "email": { "type": "string", "example": "test@example.com" }
+            }
+          }
+        }
+      },
+      "ManyUserDataResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "username": { "type": "string", "example": "test_user" },
+                "email": { "type": "string", "example": "test@example.com" }
+              }
+            }
+          }
+        },
+        "example": {
+          "code": 200,
+          "status": "OK",
+          "data": [
+            {
+              "username": "john_doe",
+              "email": "john.doe@example.com"
+            },
+            {
+              "username": "jane_smith",
+              "email": "jane.smith@example.com"
+            },
+            {
+              "username": "alice_wonder",
+              "email": "alice.wonder@example.com"
+            }
+          ]
+        }
+      },
+      "AddUpdateTaskRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Test Task" },
+          "color": { "type": "string", "example": "blue" },
+          "isShared": { "type": "boolean", "example": true }
+        }
+      },
+      "TaskDataResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer", "example": 1 },
+              "name": { "type": "string", "example": "Test Task" },
+              "color": { "type": "string", "example": "blue" },
+              "isShared": { "type": "boolean", "example": true },
+              "userId": { "type": "string", "example": "test_user" },
+              "workspaceId": { "type": "integer", "example": 1 }
+            }
+          }
+        }
+      },
+      "ManyTaskDataResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer", "example": 1 },
+                "name": { "type": "string", "example": "Test Task" },
+                "color": { "type": "string", "example": "blue" },
+                "isShared": { "type": "boolean", "example": true },
+                "userId": { "type": "string", "example": "test_user" },
+                "workspaceId": { "type": "integer", "example": 1 }
+              }
+            }
+          }
+        },
+        "example": {
+          "code": 200,
+          "status": "OK",
+          "data": [
+            {
+              "id": 1,
+              "name": "test",
+              "color": "blue",
+              "isShared": true,
+              "userId": "test",
+              "workspaceId": 1
+            },
+            {
+              "id": 2,
+              "name": "test",
+              "color": "blue",
+              "isShared": true,
+              "userId": "test",
+              "workspaceId": 1
+            },
+            {
+              "id": 2,
+              "name": "test",
+              "color": "blue",
+              "isShared": true,
+              "userId": "test",
+              "workspaceId": 1
+            }
+          ]
+        }
+      },
+      "AddUpdateSubTaskRequest": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "taskData": { "type": "string", "example": "Complete API documentation" },
+          "deadline": { "type": "string", "format": "date-time", "example": "2024-01-01T12:00:00Z" },
+          "status": { "type": "integer", "example": 0 },
+          "taskId": { "type": "integer", "example": 10 }
+        }
+      },
+      "SubTaskDataResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer", "example": 1 },
+              "taskData": { "type": "string", "example": "Complete API documentation" },
+              "deadline": { "type": "string", "format": "date-time", "example": "2024-01-01T12:00:00Z" },
+              "status": { "type": "integer", "example": 0 },
+              "taskId": { "type": "integer", "example": 10 }
+            }
+          }
+        }
+      },
+      "ManySubTaskDataResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer", "example": 1 },
+                "taskData": { "type": "string", "example": "Complete API documentation" },
+                "deadline": { "type": "string", "format": "date-time", "example": "2024-01-01T12:00:00Z" },
+                "status": { "type": "integer", "example": 0 },
+                "taskId": { "type": "integer", "example": 10 }
+              }
+            }
+          }
+        },
+        "example": {
+          "code": 200,
+          "status": "OK",
+          "data": [
+            {
+              "id": 1,
+              "taskData": "Complete API documentation",
+              "deadline": "2024-01-01T12:00:00Z",
+              "status": 0,
+              "taskId": 10
+            },
+            {
+              "id": 2,
+              "taskData": "Review API implementation",
+              "deadline": "2024-01-02T12:00:00Z",
+              "status": 1,
+              "taskId": 10
+            },
+            {
+              "id": 3,
+              "taskData": "Fix API endpoint bugs",
+              "deadline": "2024-01-03T12:00:00Z",
+              "status": 0,
+              "taskId": 11
+            }
+          ]
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "token": { "type": "string", "example": "token-unique" }
+            }
+          }
+        }
+      },
+      "DeleteMessageResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 200
+          },
+          "status": {
+            "type": "string",
+            "example": "OK"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "example": 400
+          },
+          "status": {
+            "type": "string",
+            "example": "BAD REQUEST"
+          },
+          "errors": { "type": "string", "example": "Detailed error message" }
+        }
+      }
+    },
+    "parameters": {
+      "BearerAuthorizationHeader": {
+        "name": "Authorization",
+        "in": "header",
+        "required": true,
+        "schema": { "type": "string" }
+      },
+      "ApiKeyAuthorizationHeader": {
+        "name": "X-API-KEY",
+        "in": "header",
+        "required": true,
+        "schema": { "type": "string" }
+      }
+    }
+  },
+  "paths": {
+    "/api/users": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string", "example": "test" },
+                  "email": { "type": "string", "example": "test@example.com"},
+                  "password": { "type": "string", "example": "test" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserDataResponse"}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get all user",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieve all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManyUserDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed retrieve all users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/forgot-password": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Send password reset instructions",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "test@example.com" }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset instructions sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 200 },
+                    "status": { "type": "string", "example": "OK" },
+                    "message": {
+                      "type": "string",
+                      "example": "Password reset instructions sent to your email"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/reset-password": {
+      "post": {
+        "tags": ["User"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Reset user password",
+        "parameters": [
+          { "$ref": "#/components/parameters/BearerAuthorizationHeader"}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newPassword": { "type": "string", "example": "newSecurePassword123" }
+                },
+                "required": ["newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": { "type": "integer", "example": 200 },
+                    "status": { "type": "string", "example": "OK" },
+                    "message": {
+                      "type": "string",
+                      "example": "Password has been reset successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid token or password",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{username}": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Get user details by username",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The username of the user to retrieve"
+          },
+          {
+            "$ref": "#/components/parameters/BearerAuthorizationHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Admin"],
+        "summary": "Update user details by username",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The username of the user to update"
+          },
+          {
+            "$ref": "#/components/parameters/BearerAuthorizationHeader"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User details updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid user data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Admin"],
+        "summary": "Delete user by username",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The username of the user to delete"
+          },
+          {
+            "$ref": "#/components/parameters/BearerAuthorizationHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteMessageResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Login to user account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TokenResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Username or password wrong",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/current": {
+      "patch": {
+        "tags": ["User"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Update User",
+        "parameters": [
+          { "$ref": "#/components/parameters/BearerAuthorizationHeader"}
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserUpdateRequest"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserDataResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid name length",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["User"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Current User",
+        "parameters": [
+          { "$ref": "#/components/parameters/BearerAuthorizationHeader"}
+        ],
+        "responses": {
+          "200": {
+            "description": "User retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserDataResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/logout": {
+      "delete": {
+        "tags": ["User"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Logout User",
+        "parameters": [
+          { "$ref": "#/components/parameters/BearerAuthorizationHeader"}
+        ],
+        "responses": {
+          "200": {
+            "description": "User logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeleteMessageResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "tags": ["Task"],
+        "summary": "Retrieve All Tasks",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of all tasks retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ManyTaskDataResponse" }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Task"],
+        "summary": "Create a New Task",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AddUpdateTaskRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Task created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TaskDataResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid task data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{taskId}": {
+      "get": {
+        "tags": ["Task"],
+        "summary": "Retrieve Task by ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TaskDataResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Task"],
+        "summary": "Update Task by ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AddUpdateTaskRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task updated successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TaskDataResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid task data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Task"],
+        "summary": "Delete Task by ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeleteMessageResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{taskId}/subtask": {
+      "get": {
+        "tags": ["SubTask"],
+        "summary": "Retrieve All SubTasks for a Task",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task whose subtasks to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all subtasks retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/SubTaskDataResponse" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["SubTask"],
+        "summary": "Create a New SubTask for a Task",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to which the subtask belongs"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AddUpdateSubTaskRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "SubTask created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubTaskDataResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid subtask data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{taskId}/subtask/{subTaskId}": {
+      "get": {
+        "tags": ["SubTask"],
+        "summary": "Retrieve SubTask by ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to which the subtask belongs"
+          },
+          {
+            "name": "subTaskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the subtask to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SubTask retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubTaskDataResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "SubTask not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["SubTask"],
+        "summary": "Update SubTask by ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to which the subtask belongs"
+          },
+          {
+            "name": "subTaskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the subtask to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AddUpdateSubTaskRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "SubTask updated successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SubTaskDataResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid subtask data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "SubTask not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["SubTask"],
+        "summary": "Delete SubTask by ID",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the task to which the subtask belongs"
+          },
+          {
+            "name": "subTaskId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "ID of the subtask to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SubTask deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DeleteMessageResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "SubTask not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
