@@ -4,7 +4,7 @@ import {validate} from "../validation/validation.js";
 import {
     emailValidation,
     getUserValidation,
-    registerUserValidation,
+    registerUserValidation, updateUserValidation,
 } from "../validation/user-validation.js";
 import {loginUserValidation} from "../validation/user-validation.js";
 import bcrypt from "bcrypt";
@@ -120,13 +120,9 @@ const forgotPassword = async (request) => {
 }
 
 const resetPassword = async (request) => {
-    console.log(request);
     const newPassword = request.newPassword
     const confirmPassword = request.confirmPassword
     const email = request.email;
-
-    console.log(newPassword);
-    console.log(confirmPassword);
 
     if (!newPassword || !confirmPassword ) {
         throw new ResponseError(400, "Invalid input");
@@ -169,8 +165,28 @@ const get = async (username) => {
     return user;
 }
 
+const changePassword = async (user,request) => {
+    const password = validate(updateUserValidation,request);
+
+    if(password.password !== password.confirmPassword) {
+        throw new ResponseError(404, "Password do not match");
+    }
+
+    const hashedPassword = await bcrypt.hash(password.password, 10);
+    await prismaClient.user.update({
+        where: {
+            username: user.username,
+        },data  : {
+            password: hashedPassword
+        }
+    })
+
+}
+
+
 const logout = async (username) => {
     username = validate(getUserValidation,username)
+
 
     const user = await prismaClient.user.findUnique({
         where : {
@@ -193,4 +209,4 @@ const logout = async (username) => {
     })
 }
 
-export default { register ,login, forgotPassword, resetPassword, get, logout};
+export default { register ,login, forgotPassword, resetPassword, get, logout,changePassword};

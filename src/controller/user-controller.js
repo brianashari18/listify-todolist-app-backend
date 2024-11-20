@@ -69,4 +69,17 @@ const logout = async (req, res, next) => {
     }
 }
 
-export default { register,login, forgotPassword,resetPassword,get, logout };
+const changePassword = async (req, res, next) => {
+    try {
+        const user = req.user
+        const request = req.body
+        await userService.changePassword(user, request);
+        res.status(200).json({
+            data: "OK"
+        })
+    }catch (e){
+        next(e);
+    }
+}
+
+export default { register,login, forgotPassword,resetPassword,get, logout, changePassword };

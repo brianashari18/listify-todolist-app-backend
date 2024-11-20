@@ -15,6 +15,11 @@ const emailValidation = Joi.object({
     email: Joi.string().max(100).required(),
 })
 
+const updateUserValidation = Joi.object({
+    password: Joi.string().max(100).required(),
+    confirmPassword: Joi.string().max(100).required(),
+})
+
 const getUserValidation = Joi.string().max(100).required();
 
 
@@ -23,4 +28,5 @@ export {
     loginUserValidation,
     emailValidation,
     getUserValidation,
+    updateUserValidation,
 }

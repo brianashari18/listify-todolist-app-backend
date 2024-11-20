@@ -22,32 +22,20 @@ model User {
   otpExpire      DateTime?
   tasks          Task[]
   userWorkspaces UserWorkspace[]
-  Workspace      Workspace?
 
   @@map("users")
 }
 
-model Workspace {
-  id             Int             @id @default(autoincrement())
-  name           String          @db.VarChar(100)
-  userId         String          @unique
-  user           User            @relation(fields: [userId], references: [username])
-  tasks          Task[]
-  userWorkspaces UserWorkspace[]
-
-  @@map("workspaces")
-}
-
 model Task {
-  id          Int       @id @default(autoincrement())
-  name        String    @db.VarChar(100)
-  color       String    @db.VarChar(50)
-  isShared    Boolean
-  userId      String
-  workspaceId Int
-  user        User      @relation(fields: [userId], references: [username])
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  subTasks    SubTask[]
+  id            Int            @id @default(autoincrement())
+  name          String         @db.VarChar(100)
+  color         String?        @db.VarChar(50)
+  isShared      Boolean        @default(false)
+  createdBy     String?
+  workSpaceID   Int?
+  user          User?          @relation(fields: [createdBy], references: [username])
+  userWorkspace UserWorkspace? @relation(fields: [workSpaceID], references: [workspaceId])
+  subTasks      SubTask[]
 
   @@map("tasks")
 }
@@ -65,10 +53,10 @@ model SubTask {
 
 model UserWorkspace {
   username     String
-  workspaceId  Int
-  accessRights Int       @default(1) // 1 : view, 2 : edit, default 1
-  user         User      @relation(fields: [username], references: [username])
-  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId  Int    @unique
+  accessRights Int    @default(1) // 1 : view, 2 : edit, default 1
+  user         User   @relation(fields: [username], references: [username])
+  tasks        Task[]
 
   @@id([username, workspaceId])
 }
