@@ -5,7 +5,6 @@ class ResponseError extends Error {
         this.status = status;
     }
 }
-
 export {
     ResponseError
 }
