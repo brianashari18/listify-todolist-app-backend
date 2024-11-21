@@ -9,6 +9,7 @@ userRouter.use(authMiddleware);
 userRouter.get('/api/users/current', userController.get);
 userRouter.delete('/api/users/logout', userController.logout);
 userRouter.patch('/api/users/current', userController.changePassword);
+userRouter.patch('/api/users/current', userController.changeUsername);
 
 //task
 userRouter.post('/api/tasks', taskController.create);

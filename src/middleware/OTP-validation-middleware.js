@@ -13,6 +13,7 @@ const validateOTP = async (req, res, next) => {
     // if (Date.now() > user.otpExpiration) {
     //     return res.status(400).send({ message: 'OTP has expired.' });
     // }
+    req.user = user;
     next();
 };
 

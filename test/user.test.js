@@ -113,7 +113,7 @@ describe('POST /api/users', function () {
             const result = await supertest(app)
                 .post('/api/users/login')
                 .send({
-                    username: 'test',
+                    email : 'test@test.com',
                     password: 'test',
                 });
 
@@ -128,7 +128,7 @@ describe('POST /api/users', function () {
             const result = await supertest(app)
                 .post('/api/users/login')
                 .send({
-                    username: "",
+                    email: "",
                     password: ""
                 });
 
@@ -142,7 +142,7 @@ describe('POST /api/users', function () {
             const result = await supertest(app)
                 .post('/api/users/login')
                 .send({
-                    username: "test",
+                    email: "test",
                     password: "salah"
                 });
 
@@ -152,11 +152,11 @@ describe('POST /api/users', function () {
             expect(result.body.errors).toBeDefined();
         });
 
-        it('should reject login if username is wrong', async () => {
+        it('should reject login if email is wrong', async () => {
             const result = await supertest(app)
                 .post('/api/users/login')
                 .send({
-                    username: "salah",
+                    email: "salah",
                     password: "salah"
                 });
 

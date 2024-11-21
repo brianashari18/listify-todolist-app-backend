@@ -3,24 +3,16 @@ import {ResponseError} from "../error/response-error.js";
 import {validate} from "../validation/validation.js";
 import {
     emailValidation,
-    getUserValidation,
     registerUserValidation, updateUserValidation,
 } from "../validation/user-validation.js";
 import {loginUserValidation} from "../validation/user-validation.js";
 import bcrypt from "bcrypt";
 import {v4 as uuid} from "uuid";
-import nodemailer from "nodemailer";
 import 'dotenv/config'
-import Joi from "joi";
+import {logger} from "../application/logging.js";
 
 const register = async (request) => {
     const user = validate(registerUserValidation, request);
-
-    const countUser = await prismaClient.user.count({
-        where : {
-            username  : user.username,
-        }
-    })
 
     const countEmail = await prismaClient.user.count({
         where : {
@@ -28,16 +20,22 @@ const register = async (request) => {
         }
     })
 
-    if (countUser === 1) {
-        throw new ResponseError(400,"User already exists");
-    } else if (countEmail === 1) {
+    if (countEmail === 1) {
         throw new ResponseError(400,"Email already exists");
+    }
+
+    if(user.password !== user.confirmPassword) {
+        throw new ResponseError(400,"Passwords do not match");
     }
 
     user.password = await bcrypt.hash(user.password, 10);
 
     return prismaClient.user.create({
-        data : user,
+        data : {
+            username: user.username,
+            email : user.email,
+            password: user.password,
+        },
         select: {
             username: true,
             email: true
@@ -49,25 +47,24 @@ const register = async (request) => {
 const login = async (request) => {
     const loginRequest = validate(loginUserValidation, request);
 
+    logger.info(loginRequest);
     const user = await prismaClient.user.findUnique({
         where: {
-            username: loginRequest.username
+            email : loginRequest.email,
         },
         select: {
-            username: true,
-            password: true,
+            password: true
         }
     });
 
+    logger.info(user)
     if (!user) {
-        throw new ResponseError(401, "Username or Password is incorrect");
+        throw new ResponseError(401, "Email or Password is incorrect");
     }
 
-    console.log(loginRequest.password);
-    console.log(user.password);
     const isPasswordValid = await bcrypt.compare(loginRequest.password, user.password);
     if (!isPasswordValid) {
-        throw new ResponseError(401, "Username or Password wrong");
+        throw new ResponseError(401, "Email or Password wrong");
     }
     const token = uuid().toString();
 
@@ -76,7 +73,7 @@ const login = async (request) => {
             token: token
         },
         where: {
-            username: user.username
+            email: loginRequest.email
         },
         select: {
             token: true
@@ -92,7 +89,7 @@ const forgotPassword = async (request) => {
             email : email
         },
         select:{
-            username: true,
+            id : true,
             email: true,
         }
     })
@@ -119,10 +116,9 @@ const forgotPassword = async (request) => {
 
 }
 
-const resetPassword = async (request) => {
+const resetPassword = async (user,request) => {
     const newPassword = request.newPassword
     const confirmPassword = request.confirmPassword
-    const email = request.email;
 
     if (!newPassword || !confirmPassword ) {
         throw new ResponseError(400, "Invalid input");
@@ -137,7 +133,7 @@ const resetPassword = async (request) => {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await prismaClient.user.update({
             where: {
-                email: email,
+                email: user.email,
             },
             data: { password: hashedPassword }
         });
@@ -146,15 +142,15 @@ const resetPassword = async (request) => {
     }
 }
 
-const get = async (username) => {
-    username = validate(getUserValidation, username);
-
+const get = async (id) => {
     const user = await prismaClient.user.findUnique({
         where: {
-            username: username
+            id: id
         },
         select: {
-            username: true,
+            id: true,
+            username:true,
+            email:true,
         }
     });
 
@@ -163,6 +159,16 @@ const get = async (username) => {
     }
 
     return user;
+}
+
+const changeUsername = async (user,request) => {
+    await prismaClient.user.update({
+        where:{
+            id: user.id,
+        },data : {
+            username: user.username,
+        }
+    })
 }
 
 const changePassword = async (user,request) => {
@@ -175,7 +181,7 @@ const changePassword = async (user,request) => {
     const hashedPassword = await bcrypt.hash(password.password, 10);
     await prismaClient.user.update({
         where: {
-            username: user.username,
+            email: user.email,
         },data  : {
             password: hashedPassword
         }
@@ -184,13 +190,12 @@ const changePassword = async (user,request) => {
 }
 
 
-const logout = async (username) => {
-    username = validate(getUserValidation,username)
-
+const logout = async (id) => {
+    id = validate(getUserValidation,id)
 
     const user = await prismaClient.user.findUnique({
         where : {
-            username : username
+            id : id
         }
     })
 
@@ -200,13 +205,13 @@ const logout = async (username) => {
 
     await prismaClient.user.update({
         where: {
-            username: username
+            id: id
         },data:{
             token : null
         }, select : {
-            username: true
+            id: true
         }
     })
 }
 
-export default { register ,login, forgotPassword, resetPassword, get, logout,changePassword};
+export default { register ,login, forgotPassword, resetPassword, get, logout,changePassword,changeUsername }

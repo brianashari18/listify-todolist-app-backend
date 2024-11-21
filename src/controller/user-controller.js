@@ -36,7 +36,8 @@ const forgotPassword = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
     try {
-        const result = await userService.resetPassword(req.body);
+        const user = req.user
+        const result = await userService.resetPassword(user,req.body);
         res.status(200).json({
             data: result,
             message : "Reset Successfully"
@@ -48,8 +49,8 @@ const resetPassword = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const username = req.user.username;
-        const result = await userService.get(username);
+        const id = req.user.id;
+        const result = await userService.get(id);
         res.status(200).json({
             data: result
         });
@@ -60,11 +61,24 @@ const get = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
     try {
-        await userService.logout(req.user.username);
+        await userService.logout(req.user.id);
         res.status(200).json({
             data: "OK"
         });
     } catch (e) {
+        next(e);
+    }
+}
+
+const changeUsername = async (req, res, next) => {
+    try{
+        const user = req.user
+        const request = req.body
+        await userService.changeUsername(user, request);
+        res.status(200).json({
+            data: "OK"
+        })
+    }catch (e){
         next(e);
     }
 }
@@ -82,4 +96,4 @@ const changePassword = async (req, res, next) => {
     }
 }
 
-export default { register,login, forgotPassword,resetPassword,get, logout, changePassword };
+export default { register,login, forgotPassword,resetPassword,get, logout, changePassword, changeUsername };
