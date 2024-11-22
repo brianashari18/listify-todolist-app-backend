@@ -10,6 +10,7 @@ import bcrypt from "bcrypt";
 import {v4 as uuid} from "uuid";
 import 'dotenv/config'
 import {logger} from "../application/logging.js";
+import nodemailer from "nodemailer";
 
 const register = async (request) => {
     const user = validate(registerUserValidation, request);
@@ -112,7 +113,31 @@ const forgotPassword = async (request) => {
         }
     });
 
-    //send OTP to email
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD,
+        },
+    });
+
+    const mailOptions = {
+        from: '"Your App Name" <process.end.EMAIL>',
+        to: email,
+        subject: 'Your OTP for Password Reset',
+        text: `Your OTP for resetting the password is ${otp}. It is valid for 1 minutes.`,
+        html: `<p>Your OTP for resetting the password is <b>${otp}</b>. It is valid for 1 minutes.</p>`,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('OTP email sent successfully');
+    } catch (error) {
+        console.error('Error sending OTP email:', error);
+        throw new ResponseError(500, "Failed to send OTP email");
+    }
 
 }
 
@@ -191,7 +216,6 @@ const changePassword = async (user,request) => {
 
 
 const logout = async (id) => {
-    id = validate(getUserValidation,id)
 
     const user = await prismaClient.user.findUnique({
         where : {
