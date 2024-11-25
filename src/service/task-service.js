@@ -34,7 +34,42 @@ const get = async (user) => {
     return tasks;
 }
 
+const update = async (request) => {
+        const id = parseInt(request.params.taskId);
+
+        const task = await prismaClient.task.findUnique({ where: { id } });
+        if (!task) {
+            throw new ResponseError(404, "Task not found")
+        }
+
+        await prismaClient.task.update({
+            where: { id },
+            data: {
+                name: request.body.name || task.name,
+                color: request.body.color || task.color
+            }
+        });
+};
+
+const deleteTask = async (request) => {
+    const id = parseInt(request.params.taskId);
+
+    const task = await prismaClient.task.findUnique({ where: { id: id } });
+    if (!task) {
+        throw new ResponseError(404, "Task not found");
+    }
+
+    await prismaClient.task.delete({
+        where: {
+            id: id,
+        }
+    })
+}
+
+
 export default {
     create,
     get,
+    update,
+    deleteTask
 }

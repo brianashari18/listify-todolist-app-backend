@@ -73,8 +73,7 @@ const logout = async (req, res, next) => {
 const changeUsername = async (req, res, next) => {
     try{
         const user = req.user
-        const request = req.body
-        await userService.changeUsername(user, request);
+        await userService.changeUsername(user);
         res.status(200).json({
             data: "OK"
         })

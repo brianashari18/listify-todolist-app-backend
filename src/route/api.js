@@ -15,6 +15,8 @@ userRouter.patch('/api/users/current', userController.changeUsername);
 //task
 userRouter.post('/api/tasks', taskController.create);
 userRouter.get('/api/users/:username/tasks', taskController.get);
+userRouter.patch('/api/users/:username/:taskId', taskController.update);
+userRouter.delete('/api/users/:username/tasks/:taskId', taskController.deleteTask);
 
 
 export {userRouter}

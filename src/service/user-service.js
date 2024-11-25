@@ -186,7 +186,7 @@ const get = async (id) => {
     return user;
 }
 
-const changeUsername = async (user,request) => {
+const changeUsername = async (user) => {
     await prismaClient.user.update({
         where:{
             id: user.id,

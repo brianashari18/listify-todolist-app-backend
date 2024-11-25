@@ -26,6 +26,28 @@ const get = async (req, res, next) => {
     }
 }
 
+const update = async (req, res, next) => {
+    try {
+        await taskService.update(req);
+        res.status(200).json({
+            data : "Task Updated Successfully",
+        })
+    }catch (e){
+        next(e);
+    }
+}
+
+
+const deleteTask = async (req, res, next) => {
+    try {
+        await taskService.deleteTask(req);
+        res.status(200).json({
+            data : "task Deleted Successfully",
+        })
+    }catch (e){
+        next(e);
+    }
+}
 export default {
-    create,get,
+    create,get,update,deleteTask
 }
