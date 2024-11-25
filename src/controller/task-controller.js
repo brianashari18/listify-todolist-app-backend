@@ -28,9 +28,10 @@ const get = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        await taskService.update(req);
+        const result = await taskService.update(req);
         res.status(200).json({
-            data : "Task Updated Successfully",
+            data : result,
+            message : "Task Updated Successfully"
         })
     }catch (e){
         next(e);

@@ -6,7 +6,7 @@ import {ResponseError} from "../error/response-error.js";
 
 const create = async (user,request) => {
     const tasks = validate(createTaskValidation, request)
-    await prismaClient.task.create({
+    return  prismaClient.task.create({
         data: {
             name: tasks.name,
             color: tasks.color,
@@ -15,6 +15,8 @@ const create = async (user,request) => {
                 username: user.username,
                 }
             }
+        },select : {
+            id: tasks.id,
         }
     })
 }
@@ -42,11 +44,15 @@ const update = async (request) => {
             throw new ResponseError(404, "Task not found")
         }
 
-        await prismaClient.task.update({
+        return  prismaClient.task.update({
             where: { id },
             data: {
                 name: request.body.name || task.name,
                 color: request.body.color || task.color
+            },select :{
+                id: true,
+                name : true,
+                color : true,
             }
         });
 };

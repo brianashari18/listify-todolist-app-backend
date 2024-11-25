@@ -156,11 +156,16 @@ const resetPassword = async (user,request) => {
 
     try {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        await prismaClient.user.update({
+        return  prismaClient.user.update({
             where: {
                 email: user.email,
             },
-            data: { password: hashedPassword }
+            data: {
+                password: hashedPassword
+            },select : {
+                id : true,
+                username: true,
+            }
         });
     } catch (error) {
         throw new ResponseError(500, "Failed to reset password");
@@ -187,11 +192,13 @@ const get = async (id) => {
 }
 
 const changeUsername = async (user) => {
-    await prismaClient.user.update({
+    return  prismaClient.user.update({
         where:{
             id: user.id,
         },data : {
             username: user.username,
+        },select : {
+            username: true,
         }
     })
 }
@@ -204,11 +211,14 @@ const changePassword = async (user,request) => {
     }
 
     const hashedPassword = await bcrypt.hash(password.password, 10);
-    await prismaClient.user.update({
+    return prismaClient.user.update({
         where: {
             email: user.email,
         },data  : {
             password: hashedPassword
+        },select:{
+            id: true,
+            username:true,
         }
     })
 
