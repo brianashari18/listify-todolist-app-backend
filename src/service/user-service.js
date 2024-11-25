@@ -191,12 +191,13 @@ const get = async (id) => {
     return user;
 }
 
-const changeUsername = async (user) => {
+const changeUsername = async (user,req) => {
+
     return  prismaClient.user.update({
         where:{
             id: user.id,
         },data : {
-            username: user.username,
+            username: req.body.username,
         },select : {
             username: true,
         }

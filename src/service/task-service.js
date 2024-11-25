@@ -1,5 +1,5 @@
 import {prismaClient} from "../application/database.js";
-import {createTaskValidation} from "../validation/task-validation.js";
+import {createTaskValidation, updateTaskValidation} from "../validation/task-validation.js";
 import {validate} from "../validation/validation.js";
 import {ResponseError} from "../error/response-error.js";
 
@@ -12,11 +12,11 @@ const create = async (user,request) => {
             color: tasks.color,
             user: {
             connect: {
-                username: user.username,
+                id : user.id,
                 }
             }
         },select : {
-            id: tasks.id,
+            id: true,
         }
     })
 }
@@ -25,7 +25,7 @@ const get = async (user) => {
     const tasks = await prismaClient.task.findMany({
         where:{
             user:{
-            username: user.username,
+            id: user.id,
             }
         }
     })
@@ -37,6 +37,7 @@ const get = async (user) => {
 }
 
 const update = async (request) => {
+        const newData = validate(updateTaskValidation,request.body)
         const id = parseInt(request.params.taskId);
 
         const task = await prismaClient.task.findUnique({ where: { id } });
@@ -47,8 +48,8 @@ const update = async (request) => {
         return  prismaClient.task.update({
             where: { id },
             data: {
-                name: request.body.name || task.name,
-                color: request.body.color || task.color
+                name: newData.name || task.name,
+                color: newData.color || task.color
             },select :{
                 id: true,
                 name : true,

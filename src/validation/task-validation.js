@@ -7,4 +7,9 @@ const createTaskValidation = Joi.object({
 })
 
 
-export { createTaskValidation }
+const updateTaskValidation = Joi.object({
+    name: Joi.string().max(100).optional(),
+    color: Joi.string().max(100).optional(),
+})
+
+export { createTaskValidation, updateTaskValidation }
