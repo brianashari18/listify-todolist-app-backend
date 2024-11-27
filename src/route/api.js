@@ -5,6 +5,7 @@ import taskController from "../controller/task-controller.js";
 import subTaskController from "../controller/subtask-controller.js";
 import {authMiddleware} from "../middleware/auth-middleware.js";
 import workspaceController from "../controller/workspace-controller.js";
+import feedbackController from "../controller/feedback-controller.js";
 
 const userRouter = new express.Router();
 userRouter.use(authMiddleware);
@@ -35,5 +36,8 @@ userRouter.post('/api/workspace/:taskId', workspaceController.addUser);
 userRouter.get('/api/workspace/:userId/tasks', workspaceController.get);
 userRouter.patch('/api/workspace/:userId/:taskId',workspaceController.update);
 userRouter.delete('/api/workspace/:userId/tasks/:taskId', workspaceController.deleteTaskWorkspace);
+
+//feedback
+userRouter.post('/api/users/:userId/feedback', feedbackController.sendFeedback);
 
 export {userRouter}

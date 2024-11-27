@@ -23,7 +23,6 @@ model User {
   otpExpire      DateTime?
   tasks          Task[]
   userWorkspaces UserWorkspace[]
-  feedbacks      Feedback[]
 
   @@map("users")
 }
@@ -62,13 +61,4 @@ model UserWorkspace {
 
   @@id([userId, taskId])
   @@map("userworkspace")
-}
-
-model Feedback {
-  id          Int      @id @default(autoincrement())
-  feedback    String   @db.VarChar(255)
-  timeCreated DateTime
-  userId      Int
-
-  user User @relation(fields: [userId], references: [id])
 }

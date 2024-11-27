@@ -28,7 +28,7 @@ const get = async (user) => {
         where:{
             user:{
             id: user.id,
-            },
+            },isShared : false,
         }
     })
     if (tasks.length === 0) {

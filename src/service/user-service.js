@@ -142,7 +142,20 @@ const forgotPassword = async (request) => {
 
 }
 
-const resetPassword = async (user,request) => {
+const validateOtp = async (request) => {
+    const otp = request.body.otp;
+    const user = await prismaClient.user.findUnique({
+        where:{
+            otp : otp
+        }
+    })
+
+    if(!user) {
+        throw new ResponseError(403, "Otp Incorrect");
+    }
+}
+
+const resetPassword = async (request) => {
     const newPassword = request.newPassword
     const confirmPassword = request.confirmPassword
 
@@ -159,7 +172,7 @@ const resetPassword = async (user,request) => {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         return  prismaClient.user.update({
             where: {
-                email: user.email,
+                email: request.body.email,
             },
             data: {
                 password: hashedPassword
@@ -250,4 +263,4 @@ const logout = async (id) => {
     })
 }
 
-export default { register ,login, forgotPassword, resetPassword, get, logout,changePassword,changeUsername }
+export default { register ,login, forgotPassword, resetPassword, get, logout,changePassword,changeUsername, validateOtp }

@@ -97,4 +97,15 @@ const changePassword = async (req, res, next) => {
     }
 }
 
-export default { register,login, forgotPassword,resetPassword,get, logout, changePassword, changeUsername };
+const validateotp = async (req, res, next) => {
+    try{
+        await userService.validateOtp(req)
+        res.status(200).json({
+            message: "OTP Is valid",
+        })
+    }catch (e){
+        next(e);
+    }
+}
+
+export default { register,login, forgotPassword,resetPassword,get, logout, changePassword, changeUsername, validateotp};
