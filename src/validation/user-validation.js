@@ -13,7 +13,7 @@ const loginUserValidation = Joi.object({
 });
 
 const emailValidation = Joi.object({
-    email: Joi.string().max(100).required(),
+    email: Joi.string().email().max(100).required(),
 })
 
 const updateUserValidation = Joi.object({

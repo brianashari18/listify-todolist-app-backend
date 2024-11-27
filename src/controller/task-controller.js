@@ -49,6 +49,20 @@ const deleteTask = async (req, res, next) => {
         next(e);
     }
 }
+
+const addTaskToWorkspace = async (req,res, next) => {
+    try {
+        const result = await taskService.addTaskToWorkspace(req);
+
+        res.status(200).json({
+            data: result,
+            message : "Task Adding Successfully",
+        })
+    }catch (e){
+        next(e);
+    }
+}
+
 export default {
-    create,get,update,deleteTask
+    create,get,update,deleteTask, addTaskToWorkspace
 }

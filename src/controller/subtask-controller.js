@@ -26,9 +26,9 @@ const get = async (req, res, next) => {
     }
 }
 
-const getByStatus = async (req,res, next) => {
+const getByName = async (req,res, next) => {
     try {
-        const result = await subtasksService.getByStatus(req);
+        const result = await subtasksService.getByName(req);
         res.status(200).json({
             data: result,
             message : "subTask Get Successfully",
@@ -63,5 +63,5 @@ const deleteSubTask = async (req,res, next) => {
 }
 
 export default {
-    create,get,getByStatus,update, deleteSubTask
+    create,get,getByName,update, deleteSubTask
 }

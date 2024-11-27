@@ -10,7 +10,7 @@ publicRouter.post('/api/users/forgot-password', userController.forgotPassword);
 publicRouter.post('/api/users/reset-password',validateOTP, userController.resetPassword);
 
 //google login
-publicRouter.post('/api/users/google', googleController.initiateGoogleLogin);
+publicRouter.get('/api/users/google', googleController.initiateGoogleLogin);
 publicRouter.post('/api/users/google/callback', googleController.handleGoogleCallback);
 
 

@@ -28,7 +28,6 @@ const getUserProfile = async () => {
 };
 
 const findOrCreateUser = async (token,profile) => {
-    logger.info(profile);
     const {  email, name } = profile;
 
     let user = await prismaClient.user.findUnique({

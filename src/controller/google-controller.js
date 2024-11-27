@@ -5,14 +5,12 @@ import { ResponseError } from '../error/response-error.js';
 const initiateGoogleLogin = async (req, res, next) => {
     try {
         const authUrl = authService.generateAuthUrl();
-        res.status(200).json({
-            data: authUrl,
-            message: 'Google authentication URL generated successfully',
-        });
+        res.redirect(authUrl);
     } catch (e) {
         next(e);
     }
 };
+
 
 const handleGoogleCallback = async (req, res, next) => {
     const { code } = req.query;

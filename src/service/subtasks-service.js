@@ -52,19 +52,23 @@ const get = async (request) => {
     return subtasks;
 }
 
-const getByStatus = async (request) => {
-    const status = request.params.status;
-    const subtasks = await prismaClient.subTask.findMany({
+const getByName = async (request) => {
+    const search = request.body.search;
+
+    const subtask = await prismaClient.subTask.findMany({
         where: {
-            status: status,
+            name: {
+                contains: search,
+                mode: 'insensitive'
+            },
         }
     })
 
-    if (subtasks.length === 0) {
+    if (subtask.length === 0) {
         throw new ResponseError(404, "subTask not found");
     }
 
-    return subtasks;
+    return subtask;
 }
 
 const update = async (request) => {
@@ -120,5 +124,5 @@ const deleteSubTask = async (request) => {
 }
 
 export default {
-    create,get, getByStatus, update, deleteSubTask
+    create,get, getByName, update, deleteSubTask
 }

@@ -23,6 +23,7 @@ model User {
   otpExpire      DateTime?
   tasks          Task[]
   userWorkspaces UserWorkspace[]
+  feedbacks      Feedback[]
 
   @@map("users")
 }
@@ -46,7 +47,7 @@ model SubTask {
   deadline DateTime
   status   String
   taskId   Int
-  task     Task     @relation(fields: [taskId], references: [id])
+  task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@map("subtasks")
 }
@@ -54,10 +55,20 @@ model SubTask {
 model UserWorkspace {
   userId       Int
   taskId       Int
-  accessRights Int @default(1)
+  accessRights Int @default(1) //1.view, 2.edit
 
-  user User @relation(fields: [userId], references: [id])
-  task Task @relation(fields: [taskId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
+  task Task? @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@id([userId, taskId])
+  @@map("userworkspace")
+}
+
+model Feedback {
+  id          Int      @id @default(autoincrement())
+  feedback    String   @db.VarChar(255)
+  timeCreated DateTime
+  userId      Int
+
+  user User @relation(fields: [userId], references: [id])
 }

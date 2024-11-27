@@ -17,6 +17,8 @@ const create = async (user,request) => {
             }
         },select : {
             id: true,
+            name: true,
+            color: true,
         }
     })
 }
@@ -26,7 +28,7 @@ const get = async (user) => {
         where:{
             user:{
             id: user.id,
-            }
+            },
         }
     })
     if (tasks.length === 0) {
@@ -73,16 +75,53 @@ const deleteTask = async (request) => {
     })
 }
 
-
-const addTask = async (request) => {
-    const userId = parseInt(request.params.userId);
+const addTaskToWorkspace = async (request) => {
     const taskId = parseInt(request.params.taskId);
+    const accessRights = parseInt(request.body.accessRights);
+    const user = await prismaClient.user.findUnique(
+        { where: {
+                email : request.body.email,
+            }
+        });
+    if (!user) {
+        throw new ResponseError(404,"user not found");
+    }
 
+    await prismaClient.task.update({
+        where: {
+            id: taskId,
+        },data : {
+            isShared: true,
+        }
+    })
+
+    return prismaClient.userWorkspace.upsert({
+        where: {
+            userId_taskId: {
+                userId: user.id,
+                taskId: taskId,
+            },
+        },
+        update: {
+            accessRights: accessRights,
+        },
+        create: {
+            taskId: taskId,
+            userId: user.id,
+            accessRights: accessRights,
+        },
+        select: {
+            userId: true,
+            accessRights: true,
+        },
+    });
 }
+
 
 export default {
     create,
     get,
     update,
-    deleteTask
+    deleteTask,
+    addTaskToWorkspace
 }
