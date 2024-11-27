@@ -1,0 +1,294 @@
+openapi: 3.0.3
+info:
+  title: User Management API
+  description: API for managing user registration, login, password reset, and more.
+  version: 1.0.0
+  contact:
+    name: API Support
+    url: https://www.example.com/support
+    email: support@example.com
+
+servers:
+  - url: https://localhost:8080/api
+    description: Main production server
+
+paths:
+  /users/register:
+    post:
+      summary: Register a new user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+                - confirmPassword
+              properties:
+                username:
+                  type: string
+                  example: "john_doe"
+                email:
+                  type: string
+                  format: email
+                  example: "johndoe@example.com"
+                password:
+                  type: string
+                  example: "password123"
+                confirmPassword:
+                  type: string
+                  example: "password123"
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: "john_doe"
+                  email:
+                    type: string
+                    format: email
+                    example: "johndoe@example.com"
+        '400':
+          description: Invalid input or email already exists
+        '500':
+          description: Server error
+
+  /users/login:
+    post:
+      summary: Login an existing user
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "johndoe@example.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        '200':
+          description: User successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "random-token-string"
+        '401':
+          description: Invalid credentials
+
+  /users/forgot-password:
+    post:
+      summary: Request password reset
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "johndoe@example.com"
+      responses:
+        '200':
+          description: OTP sent for password reset
+        '404':
+          description: User not found
+        '500':
+          description: Failed to send OTP email
+
+  /users/reset-password:
+    post:
+      summary: Reset user password using OTP
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newPassword
+                - confirmPassword
+              properties:
+                newPassword:
+                  type: string
+                  example: "newpassword123"
+                confirmPassword:
+                  type: string
+                  example: "newpassword123"
+      responses:
+        '200':
+          description: Password successfully reset
+        '400':
+          description: Invalid input or passwords do not match
+        '500':
+          description: Server error
+
+  /users/current:
+    get:
+      summary: Get current user details
+      operationId: getUser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: User details retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  username:
+                    type: string
+                    example: "john_doe"
+                  email:
+                    type: string
+                    format: email
+                    example: "johndoe@example.com"
+        '404':
+          description: User not found
+
+  /users/current/{userId}:
+    patch:
+      summary: Change the username of an existing user
+      operationId: changeUsername
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+              properties:
+                username:
+                  type: string
+                  example: "new_username"
+      responses:
+        '200':
+          description: Username successfully updated
+        '404':
+          description: User not found
+
+  /users/current:
+    patch:
+      summary: Change the password of an existing user
+      operationId: changePassword
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - password
+                - confirmPassword
+              properties:
+                password:
+                  type: string
+                  example: "newpassword123"
+                confirmPassword:
+                  type: string
+                  example: "newpassword123"
+      responses:
+        '200':
+          description: Password successfully updated
+        '400':
+          description: Invalid input or passwords do not match
+        '404':
+          description: User not found
+
+  /users/logout:
+    post:
+      summary: Logout user
+      operationId: logoutUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                  example: 1
+      responses:
+        '200':
+          description: User successfully logged out
+        '404':
+          description: User not found
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: "john_doe"
+        email:
+          type: string
+          format: email
+          example: "johndoe@example.com"
+        password:
+          type: string
+          example: "password123"
+        token:
+          type: string
+          example: "random-token-string"

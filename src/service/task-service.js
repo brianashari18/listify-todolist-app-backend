@@ -74,6 +74,12 @@ const deleteTask = async (request) => {
 }
 
 
+const addTask = async (request) => {
+    const userId = parseInt(request.params.userId);
+    const taskId = parseInt(request.params.taskId);
+
+}
+
 export default {
     create,
     get,

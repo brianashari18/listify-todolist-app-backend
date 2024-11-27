@@ -38,6 +38,7 @@ const register = async (request) => {
             password: user.password,
         },
         select: {
+            id : true,
             username: true,
             email: true
         }

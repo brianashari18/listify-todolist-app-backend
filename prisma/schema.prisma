@@ -28,15 +28,14 @@ model User {
 }
 
 model Task {
-  id            Int            @id @default(autoincrement())
-  name          String         @db.VarChar(100)
-  color         String?        @db.VarChar(50)
-  isShared      Boolean        @default(false)
-  createdBy     Int
-  workSpaceID   Int?
-  user          User?          @relation(fields: [createdBy], references: [id])
-  userWorkspace UserWorkspace? @relation(fields: [workSpaceID], references: [workspaceId])
-  subTasks      SubTask[]
+  id             Int             @id @default(autoincrement())
+  name           String          @db.VarChar(100)
+  color          String?         @db.VarChar(50)
+  isShared       Boolean         @default(false)
+  createdBy      Int
+  user           User?           @relation(fields: [createdBy], references: [id])
+  subTasks       SubTask[]
+  userWorkspaces UserWorkspace[]
 
   @@map("tasks")
 }
@@ -53,11 +52,12 @@ model SubTask {
 }
 
 model UserWorkspace {
-  id           Int
-  workspaceId  Int    @unique
-  accessRights Int    @default(1) // 1 : view, 2 : edit, default 1
-  user         User   @relation(fields: [id], references: [id])
-  tasks        Task[]
+  userId       Int
+  taskId       Int
+  accessRights Int @default(1)
 
-  @@id([id, workspaceId])
+  user User @relation(fields: [userId], references: [id])
+  task Task @relation(fields: [taskId], references: [id])
+
+  @@id([userId, taskId])
 }
