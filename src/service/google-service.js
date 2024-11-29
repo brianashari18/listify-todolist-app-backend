@@ -1,5 +1,6 @@
-import { google } from 'googleapis';
-import { prismaClient } from '../application/database.js';
+import {google} from 'googleapis';
+import {prismaClient} from '../application/database.js';
+import {OAuth2Client} from 'google-auth-library';
 import {logger} from "../application/logging.js";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -7,6 +8,7 @@ const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URL;
 
 const oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+const client = new OAuth2Client();
 
 const generateAuthUrl = () => {
     return oauth2Client.generateAuthUrl({
@@ -27,9 +29,7 @@ const getUserProfile = async () => {
     return profile;
 };
 
-const findOrCreateUser = async (token,profile) => {
-    const {  email, name } = profile;
-
+const findOrCreateUser = async (token,email,name) => {
     let user = await prismaClient.user.findUnique({
         where: { email },
     });
@@ -37,20 +37,37 @@ const findOrCreateUser = async (token,profile) => {
     if (!user) {
         user = await prismaClient.user.create({
             data: {
-                email,
+                email : email,
                 username : name,
                 token : token
-            },
+            }
         });
+    } else {
+        user = await prismaClient.user.update({
+            where: {
+                email : email,
+            },
+            data: {
+                token: token,
+            }
+        })
     }
 
     return user;
 };
 
+const verify = async (token, client_id) => {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: client_id,
+    });
+    return ticket.getPayload();
+}
 
 export default {
     generateAuthUrl,
     getTokens,
     getUserProfile,
     findOrCreateUser,
+    verify
 };

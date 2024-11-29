@@ -10,8 +10,8 @@ publicRouter.post('/api/users/validateOtp', userController.validateOtp);
 publicRouter.post('/api/users/reset-password', userController.resetPassword);
 
 //google login
-publicRouter.get('/api/users/google', googleController.initiateGoogleLogin);
-publicRouter.post('/api/users/google/callback', googleController.handleGoogleCallback);
+publicRouter.post('/api/users/google', googleController.googleLogin);
+// publicRouter.post('/api/users/google/callback', googleController.handleGoogleCallback);
 
 
 export {
