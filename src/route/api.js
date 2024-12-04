@@ -36,6 +36,7 @@ userRouter.post('/api/workspace/:taskId', workspaceController.addUser);
 userRouter.get('/api/workspace/:userId/tasks', workspaceController.get);
 userRouter.patch('/api/workspace/:userId/:taskId',workspaceController.update);
 userRouter.delete('/api/workspace/:userId/tasks/:taskId', workspaceController.deleteTaskWorkspace);
+userRouter.delete('/api/workspace/:userId/tasks/:taskId/remove', workspaceController.removeUser);
 
 //feedback
 userRouter.post('/api/users/:userId/feedback', feedbackController.sendFeedback);

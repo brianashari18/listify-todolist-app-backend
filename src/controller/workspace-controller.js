@@ -61,6 +61,17 @@ const deleteTaskWorkspace = async (req,res, next) => {
     }
 }
 
+const removeUser = async (req,res, next) => {
+    try {
+        await workspaceService.removeUser(req);
+        res.status(200).json({
+            data : "user Removed Successfully",
+        })
+    }catch (e){
+        next(e);
+    }
+}
+
 export default {
-    create,addUser,update, get, deleteTaskWorkspace,
+    create,addUser,update, get, deleteTaskWorkspace, removeUser
 }
