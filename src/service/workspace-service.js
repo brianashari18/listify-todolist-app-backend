@@ -2,6 +2,7 @@ import {validate} from "../validation/validation.js";
 import {createTaskValidation, updateTaskValidation} from "../validation/task-validation.js";
 import {prismaClient} from "../application/database.js";
 import {ResponseError} from "../error/response-error.js";
+import user from "nodemailer/lib/smtp-connection/index.js";
 
 const create = async (user, request) => {
     const tasks = validate(createTaskValidation, request)
@@ -33,8 +34,9 @@ const addUser = async (request) => {
             }
         });
     if (!user) {
-        throw new ResponseError(404, "user not found");
+        throw new ResponseError(404, "User not found");
     }
+
 
     const task = await prismaClient.task.findUnique(
         {
@@ -59,8 +61,8 @@ const addUser = async (request) => {
             accessRights: accessRights,
         },
         create: {
-            taskId: taskId,
-            userId: user.id,
+            user: { connect: { id: user.id } },
+            task: { connect: { id: taskId } },
             accessRights: accessRights,
         },
         select: {
@@ -69,7 +71,8 @@ const addUser = async (request) => {
         },
     });
 
-}
+};
+
 
 const update = async (user, request) => {
     const newData = validate(updateTaskValidation, request.body)
@@ -202,6 +205,27 @@ const deleteTaskWorkspace = async (user, request) => {
     })
 }
 
+const removeUser = async (request) => {
+    const taskId = parseInt(request.params.taskId);
+    const user = await prismaClient.user.findUnique({
+        where: {
+            email : request.body.email,
+        }
+    })
+    if (!user) {
+        throw new ResponseError(404, "User not found");
+    }
+
+    await prismaClient.userWorkspace.delete({
+        where: {
+            userId_taskId : {
+                taskId: taskId,
+                userId : user.id
+            }
+        }
+    })
+}
+
 export default {
-    create, addUser, update, get, deleteTaskWorkspace, getPeopleAccess
+    create, addUser , update, get, deleteTaskWorkspace, removeUser
 }
