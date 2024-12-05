@@ -19,7 +19,7 @@ userRouter.patch('/api/users/current/userId', userController.changeUsername);
 //task
 userRouter.post('/api/tasks', taskController.create);
 userRouter.get('/api/users/:userId/tasks', taskController.get);
-userRouter.patch('/api/users/:userId/:taskId', taskController.update);
+userRouter.patch('/api/users/:userId/tasks/:taskId', taskController.update);
 userRouter.delete('/api/users/:userId/tasks/:taskId', taskController.deleteTask);
 userRouter.post('/api/tasks/:taskId', taskController.addTaskToWorkspace);
 
@@ -34,7 +34,7 @@ userRouter.delete('/api/tasks/:taskId/:subTaskId', subTaskController.deleteSubTa
 userRouter.post('/api/workspace/tasks', workspaceController.create);
 userRouter.post('/api/workspace/:taskId', workspaceController.addUser);
 userRouter.get('/api/workspace/:userId/tasks', workspaceController.get);
-userRouter.patch('/api/workspace/:userId/:taskId',workspaceController.update);
+userRouter.patch('/api/workspace/:userId/tasks/:taskId',workspaceController.update);
 userRouter.delete('/api/workspace/:userId/tasks/:taskId', workspaceController.deleteTaskWorkspace);
 
 //feedback

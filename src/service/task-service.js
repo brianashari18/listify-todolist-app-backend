@@ -2,10 +2,13 @@ import {prismaClient} from "../application/database.js";
 import {createTaskValidation, updateTaskValidation} from "../validation/task-validation.js";
 import {validate} from "../validation/validation.js";
 import {ResponseError} from "../error/response-error.js";
+import {logger} from "../application/logging.js";
 
 
 const create = async (user,request) => {
     const tasks = validate(createTaskValidation, request)
+
+    logger.info("TEST: " + tasks.name);
     return  prismaClient.task.create({
         data: {
             name: tasks.name,
@@ -24,6 +27,7 @@ const create = async (user,request) => {
 }
 
 const get = async (user) => {
+
     const tasks = await prismaClient.task.findMany({
         where:{
             user:{
