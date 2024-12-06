@@ -125,7 +125,7 @@ const forgotPassword = async (request) => {
     });
 
     const mailOptions = {
-        from: '"Your App Name" <process.end.EMAIL>',
+        from: '"Listify" <process.end.EMAIL>',
         to: email,
         subject: 'Your OTP for Password Reset',
         text: `Your OTP for resetting the password is ${otp}. It is valid for 1 minutes.`,
