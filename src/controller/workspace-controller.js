@@ -27,7 +27,6 @@ const addUser = async (req,res, next) => {
 
 const update = async (req,res, next) => {
     try {
-        console.log(req.params)
         const user = req.user
         const result = await workspaceService.update(user,req);
         res.status(200).json({
@@ -72,6 +71,17 @@ const removeUser = async (req,res, next) => {
     }
 }
 
+const getUserWithAccess = async (req,res, next) => {
+    try {
+        const result = await workspaceService.getUserWithAccess(req);
+        res.status(200).json({
+            data: result,
+        });
+    }catch (e){
+        next(e);
+    }
+}
+
 export default {
-    create,addUser,update, get, deleteTaskWorkspace, removeUser
+    create,addUser,update, get, deleteTaskWorkspace, removeUser, getUserWithAccess
 }

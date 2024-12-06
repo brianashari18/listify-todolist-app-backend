@@ -1,9 +1,7 @@
 import {validate} from "../validation/validation.js";
 import {createTaskValidation, updateTaskValidation} from "../validation/task-validation.js";
 import {prismaClient} from "../application/database.js";
-import {emailValidation} from "../validation/user-validation.js";
 import {ResponseError} from "../error/response-error.js";
-import user from "nodemailer/lib/smtp-connection/index.js";
 
 const create = async (user,request) => {
     const tasks = validate(createTaskValidation, request)
@@ -14,7 +12,7 @@ const create = async (user,request) => {
             isShared : true,
             user: {
                 connect: {
-                    id : user.id,
+                    email : user.email,
                 }
             }
         },select : {
@@ -42,8 +40,8 @@ const addUser = async (request) => {
 
     return prismaClient.userWorkspace.upsert({
         where: {
-            userId_taskId: {
-                userId: user.id,
+            email_taskId: {
+                email: user.email,
                 taskId: taskId,
             },
         },
@@ -51,12 +49,12 @@ const addUser = async (request) => {
             accessRights: accessRights,
         },
         create: {
-            user: { connect: { id: user.id } },
+            user: { connect: { email: user.email } },
             task: { connect: { id: taskId } },
             accessRights: accessRights,
         },
         select: {
-            userId: true,
+            email: true,
             accessRights: true,
         },
     });
@@ -70,21 +68,29 @@ const update = async (user,request) => {
 
     const userWorkspace = await prismaClient.userWorkspace.findUnique({
         where:{
-            userId_taskId: {
-                userId: parseInt(request.params.userId),
+            email_taskId: {
+                email: user.email,
                 taskId: id,
         }
-        },select :{
-            accessRights: true,
         }
     })
 
-    if (!userWorkspace) {
-        throw new ResponseError(404, "UserWorkspace not found")
+    const task = await prismaClient.task.findUnique({
+        where: {
+            id : userWorkspace.taskId
+        }
+    })
+
+    if (!userWorkspace && task.createdBy !== user.id) {
+        throw new ResponseError(404, "UserWorkspace not found");
     }
 
-    if (userWorkspace.accessRights !== 2) {
-        throw new ResponseError(403, "U dont have access rights");
+    if(userWorkspace){
+        if (userWorkspace.accessRights !== 2){
+            throw new ResponseError(403, "u dont have access rights");
+        }
+    }else if (task.createdBy !== user.id) {
+        throw new ResponseError(403, "u dont have access rights");
     }
 
     return prismaClient.task.update({
@@ -104,7 +110,7 @@ const get = async (user) => {
     const tasks = await prismaClient.task.findMany({
         where:{
             user:{
-                id: user.id,
+                email: user.email,
             },isShared : true,
         }
     })
@@ -112,12 +118,26 @@ const get = async (user) => {
         throw new ResponseError(404, "Task not found");
     }
 
+    const workspace = await prismaClient.userWorkspace.findMany({
+        where:{
+            email: user.email
+        }
+    })
+
+    const len = tasks.length;
+    for(let i = 0 ; i < workspace.length;i++ ){
+        tasks[len + i] = await prismaClient.task.findUnique({
+            where:{
+                id : workspace[i]['taskId'],
+            }
+        })
+    }
+
     return tasks;
 }
 
 const deleteTaskWorkspace = async (request) => {
     const id = parseInt(request.params.taskId);
-    const userId = parseInt(request.params.userId);
     const task = await prismaClient.task.findUnique({ where: { id: id } });
     if (!task) {
         throw new ResponseError(404, "Task not found");
@@ -125,15 +145,15 @@ const deleteTaskWorkspace = async (request) => {
 
     const userWorkspace = await prismaClient.userWorkspace.findUnique({
         where: {
-            userId_taskId: {
+           email_taskId: {
                 taskId: id,
-                userId: userId
+                email : request.user.email,
             }
         }
 
     })
 
-    if (!userWorkspace && task.createdBy !== userId) {
+    if (!userWorkspace && task.createdBy !== request.user.id) {
         throw new ResponseError(404, "UserWorkspace not found");
     }
 
@@ -141,7 +161,7 @@ const deleteTaskWorkspace = async (request) => {
         if (userWorkspace.accessRights !== 2){
             throw new ResponseError(403, "u dont have access rights");
         }
-    }else if (task.createdBy !== userId) {
+    }else if (task.createdBy !== request.user.id) {
         throw new ResponseError(403, "u dont have access rights");
     }
 
@@ -171,14 +191,42 @@ const removeUser = async (request) => {
 
     await prismaClient.userWorkspace.delete({
         where: {
-            userId_taskId : {
+            email_taskId: {
                 taskId: taskId,
-                userId : user.id
+                email : user.email
             }
         }
     })
 }
 
+const getUserWithAccess = async (request) => {
+    const workspace = await prismaClient.userWorkspace.findMany({
+        where :{
+            taskId : parseInt(request.params.taskId)
+        },select : {
+            email : true,
+            accessRights :true,
+        }
+    })
+    const createdBy = await prismaClient.task.findUnique({
+        where: {
+            id : parseInt(request.params.taskId)
+        },select : {
+            createdBy: true
+        }
+    })
+        workspace.push( await prismaClient.user.findUnique({
+        where: {
+            id : createdBy.createdBy
+        },select : {
+            email : true,
+        }
+    }))
+
+    //index terakhir owner
+    return workspace;
+}
+
 export default {
-    create, addUser , update, get, deleteTaskWorkspace, removeUser
+    create, addUser , update, get, deleteTaskWorkspace, removeUser, getUserWithAccess
 }
