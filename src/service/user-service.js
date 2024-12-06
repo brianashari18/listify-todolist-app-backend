@@ -158,8 +158,9 @@ const validateOtp = async (request) => {
 const resetPassword = async (request) => {
     const newPassword = request.newPassword
     const confirmPassword = request.confirmPassword
+    const email = request.email;
 
-    if (!newPassword || !confirmPassword ) {
+    if (!newPassword || !confirmPassword || !email) {
         throw new ResponseError(400, "Invalid input");
     }
 
@@ -172,7 +173,7 @@ const resetPassword = async (request) => {
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         return  prismaClient.user.update({
             where: {
-                email: request.body.email,
+                email: email,
             },
             data: {
                 password: hashedPassword

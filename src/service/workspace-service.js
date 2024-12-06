@@ -3,19 +3,19 @@ import {createTaskValidation, updateTaskValidation} from "../validation/task-val
 import {prismaClient} from "../application/database.js";
 import {ResponseError} from "../error/response-error.js";
 
-const create = async (user,request) => {
+const create = async (user, request) => {
     const tasks = validate(createTaskValidation, request)
     return prismaClient.task.create({
         data: {
             name: tasks.name,
             color: tasks.color,
-            isShared : true,
+            isShared: true,
             user: {
                 connect: {
-                    email : user.email,
+                    id: user.id,
                 }
             }
-        },select : {
+        }, select: {
             id: true,
             name: true,
             color: true,
@@ -26,17 +26,28 @@ const create = async (user,request) => {
 const addUser = async (request) => {
     const taskId = parseInt(request.params.taskId);
     const accessRights = parseInt(request.body.accessRights);
-
-    const user = await prismaClient.user.findUnique({
-        where: {
-            email: request.body.email,
-        },
-    });
-
+    const user = await prismaClient.user.findUnique(
+        {
+            where: {
+                email: request.body.email,
+            }
+        });
     if (!user) {
         throw new ResponseError(404, "User not found");
     }
 
+
+    const task = await prismaClient.task.findUnique(
+        {
+            where: {
+                id: taskId,
+            }
+        }
+    )
+
+    if (task.createdBy === user.id) {
+        throw new ResponseError(400, "user is an owner");
+    }
 
     return prismaClient.userWorkspace.upsert({
         where: {
@@ -62,8 +73,8 @@ const addUser = async (request) => {
 };
 
 
-const update = async (user,request) => {
-    const newData = validate(updateTaskValidation,request.body)
+const update = async (user, request) => {
+    const newData = validate(updateTaskValidation, request.body)
     const id = parseInt(request.params.taskId);
 
     const userWorkspace = await prismaClient.userWorkspace.findUnique({
@@ -86,57 +97,48 @@ const update = async (user,request) => {
     }
 
     if(userWorkspace){
-        if (userWorkspace.accessRights !== 2){
-            throw new ResponseError(403, "u dont have access rights");
+        if (!task){
+            throw new ResponseError(400, "u dont have access rights");
         }
     }else if (task.createdBy !== user.id) {
-        throw new ResponseError(403, "u dont have access rights");
+        throw new ResponseError(403, "u dont have access rights")
     }
 
     return prismaClient.task.update({
-        where: { id },
+        where: {id},
         data: {
             name: newData.name || task.name,
             color: newData.color || task.color
-        },select :{
+        }, select: {
             id: true,
-            name : true,
-            color : true,
+            name: true,
+            color: true,
         }
     });
 };
 
 const get = async (user) => {
     const tasks = await prismaClient.task.findMany({
-        where:{
-            user:{
-                email: user.email,
-            },isShared : true,
-        }
-    })
+        where: {
+            OR: [
+                {createdBy: user.id, isShared: true},
+                {
+                    userWorkspaces: {
+                        some: {email: user.email, accessRights: {in: [1, 2]}},
+                    },
+                },
+            ],
+        },
+    });
+
     if (tasks.length === 0) {
         throw new ResponseError(404, "Task not found");
-    }
-
-    const workspace = await prismaClient.userWorkspace.findMany({
-        where:{
-            email: user.email
-        }
-    })
-
-    const len = tasks.length;
-    for(let i = 0 ; i < workspace.length;i++ ){
-        tasks[len + i] = await prismaClient.task.findUnique({
-            where:{
-                id : workspace[i]['taskId'],
-            }
-        })
     }
 
     return tasks;
 }
 
-const deleteTaskWorkspace = async (request) => {
+const deleteTaskWorkspace = async (user, request) => {
     const id = parseInt(request.params.taskId);
     const task = await prismaClient.task.findUnique({ where: { id: id } });
     if (!task) {
@@ -166,14 +168,14 @@ const deleteTaskWorkspace = async (request) => {
     }
 
     await prismaClient.userWorkspace.deleteMany({
-        where:{
-            taskId : id,
+        where: {
+            taskId: id,
         }
     })
 
     await prismaClient.task.delete({
-        where : {
-            id : id
+        where: {
+            id: id
         }
     })
 }

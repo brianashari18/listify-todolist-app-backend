@@ -51,7 +51,8 @@ const get = async (req, res, next) => {
 
 const deleteTaskWorkspace = async (req,res, next) => {
     try {
-        await workspaceService.deleteTaskWorkspace(req);
+        const user = req.user;
+        await workspaceService.deleteTaskWorkspace(user, req);
         res.status(200).json({
             data : "task Deleted Successfully",
         })
