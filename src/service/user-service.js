@@ -49,7 +49,6 @@ const register = async (request) => {
 const login = async (request) => {
     const loginRequest = validate(loginUserValidation, request);
 
-    logger.info(loginRequest);
     const user = await prismaClient.user.findUnique({
         where: {
             email : loginRequest.email,
@@ -101,8 +100,8 @@ const forgotPassword = async (request) => {
     }
 
     const otp = Math.floor(1000 + Math.random() * 9000);
-    // const otpExpire = new Date();
-    // otpExpire.setMinutes(otpExpire.getMinutes() + 1);
+    const otpExpire = new Date();
+    otpExpire.setMinutes(otpExpire.getMinutes() + 1);
 
     await prismaClient.user.update({
         where: {

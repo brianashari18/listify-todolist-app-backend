@@ -2,10 +2,10 @@ import {validate} from "../validation/validation.js";
 import {createTaskValidation, updateTaskValidation} from "../validation/task-validation.js";
 import {prismaClient} from "../application/database.js";
 import {ResponseError} from "../error/response-error.js";
-import user from "nodemailer/lib/smtp-connection/index.js";
 
 const create = async (user, request) => {
     const tasks = validate(createTaskValidation, request)
+
     return prismaClient.task.create({
         data: {
             name: tasks.name,
