@@ -52,8 +52,8 @@ const addUser = async (request) => {
 
     return prismaClient.userWorkspace.upsert({
         where: {
-            userId_taskId: {
-                userId: user.id,
+            email_taskId: {
+                email: user.email,
                 taskId: taskId,
             },
         },
@@ -61,12 +61,12 @@ const addUser = async (request) => {
             accessRights: accessRights,
         },
         create: {
-            user: { connect: { id: user.id } },
+            user: { connect: { email: user.email } },
             task: { connect: { id: taskId } },
             accessRights: accessRights,
         },
         select: {
-            userId: true,
+            email: true,
             accessRights: true,
         },
     });
@@ -78,39 +78,31 @@ const update = async (user, request) => {
     const newData = validate(updateTaskValidation, request.body)
     const id = parseInt(request.params.taskId);
 
-    // const userWorkspace = await prismaClient.userWorkspace.findUnique({
-    //     where:{
-    //         userId_taskId: {
-    //             userId: parseInt(request.params.userId),
-    //             taskId: id,
-    //     }
-    //     },select :{
-    //         accessRights: true,
-    //     }
-    // })
-    //
+    const userWorkspace = await prismaClient.userWorkspace.findUnique({
+        where:{
+            email_taskId: {
+                email: user.email,
+                taskId: id,
+        }
+        }
+    })
 
     const task = await prismaClient.task.findUnique({
         where: {
-            id: id, OR: [
-                {createdBy: user.id},
-                {userWorkspaces: {some: {userId: parseInt(request.params.userId), accessRights: 2}}}
-            ]
-        },
-        select: {
-            id: true,
-            name: true,
-            color: true,
-            userWorkspaces: {
-                select: {
-                    accessRights: true,
-                }
-            }
+            id : userWorkspace.taskId
         }
-    });
+    })
 
-    if (!task) {
-        throw new ResponseError(400, "U dont have access rights")
+    if (!userWorkspace && task.createdBy !== user.id) {
+        throw new ResponseError(404, "UserWorkspace not found");
+    }
+
+    if(userWorkspace){
+        if (!task){
+            throw new ResponseError(400, "u dont have access rights");
+        }
+    }else if (task.createdBy !== user.id) {
+        throw new ResponseError(403, "u dont have access rights")
     }
 
     return prismaClient.task.update({
@@ -133,7 +125,7 @@ const get = async (user) => {
                 {createdBy: user.id, isShared: true},
                 {
                     userWorkspaces: {
-                        some: {userId: user.id, accessRights: {in: [1, 2]}},
+                        some: {email: user.email, accessRights: {in: [1, 2]}},
                     },
                 },
             ],
@@ -149,47 +141,31 @@ const get = async (user) => {
 
 const deleteTaskWorkspace = async (user, request) => {
     const id = parseInt(request.params.taskId);
-    // const task = await prismaClient.task.findUnique({where: {id: id}});
-    // if (!task) {
-    //     throw new ResponseError(404, "Task not found");
-    // }
-    //
-    // const userWorkspace = await prismaClient.userWorkspace.findUnique({
-    //     where: {
-    //         userId_taskId: {
-    //             userId: parseInt(request.params.userId),
-    //             taskId: id,
-    //         }
-    //     }, select: {
-    //         accessRights: true,
-    //     }
-    // })
-    //
-    // if (!userWorkspace) {
-    //     throw new ResponseError(404, "UserWorkspace not found");
-    // }
+    const task = await prismaClient.task.findUnique({ where: { id: id } });
+    if (!task) {
+        throw new ResponseError(404, "Task not found");
+    }
 
-    const task = await prismaClient.task.findUnique({
+    const userWorkspace = await prismaClient.userWorkspace.findUnique({
         where: {
-            id: id, OR: [
-                {createdBy: user.id},
-                {userWorkspaces: {some: {userId: parseInt(request.params.userId), accessRights: 2}}}
-            ]
-        },
-        select: {
-            id: true,
-            name: true,
-            color: true,
-            userWorkspaces: {
-                select: {
-                    accessRights: true,
-                }
+           email_taskId: {
+                taskId: id,
+                email : request.user.email,
             }
         }
-    });
 
-    if (!task) {
-        throw new ResponseError(400, "U dont have access rights");
+    })
+
+    if (!userWorkspace && task.createdBy !== request.user.id) {
+        throw new ResponseError(404, "UserWorkspace not found");
+    }
+
+    if(userWorkspace){
+        if (userWorkspace.accessRights !== 2){
+            throw new ResponseError(403, "u dont have access rights");
+        }
+    }else if (task.createdBy !== request.user.id) {
+        throw new ResponseError(403, "u dont have access rights");
     }
 
     await prismaClient.userWorkspace.deleteMany({
@@ -218,14 +194,42 @@ const removeUser = async (request) => {
 
     await prismaClient.userWorkspace.delete({
         where: {
-            userId_taskId : {
+            email_taskId: {
                 taskId: taskId,
-                userId : user.id
+                email : user.email
             }
         }
     })
 }
 
+const getUserWithAccess = async (request) => {
+    const workspace = await prismaClient.userWorkspace.findMany({
+        where :{
+            taskId : parseInt(request.params.taskId)
+        },select : {
+            email : true,
+            accessRights :true,
+        }
+    })
+    const createdBy = await prismaClient.task.findUnique({
+        where: {
+            id : parseInt(request.params.taskId)
+        },select : {
+            createdBy: true
+        }
+    })
+        workspace.push( await prismaClient.user.findUnique({
+        where: {
+            id : createdBy.createdBy
+        },select : {
+            email : true,
+        }
+    }))
+
+    //index terakhir owner
+    return workspace;
+}
+
 export default {
-    create, addUser , update, get, deleteTaskWorkspace, removeUser
+    create, addUser , update, get, deleteTaskWorkspace, removeUser, getUserWithAccess
 }

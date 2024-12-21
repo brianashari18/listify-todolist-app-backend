@@ -101,8 +101,8 @@ const addTaskToWorkspace = async (request) => {
 
     return prismaClient.userWorkspace.upsert({
         where: {
-            userId_taskId: {
-                userId: user.id,
+            email_taskId: {
+                email: user.email,
                 taskId: taskId,
             },
         },
@@ -110,12 +110,12 @@ const addTaskToWorkspace = async (request) => {
             accessRights: accessRights,
         },
         create: {
-            taskId: taskId,
-            userId: user.id,
+            user: { connect: { email: user.email } },
+            task: { connect: { id: taskId } },
             accessRights: accessRights,
         },
         select: {
-            userId: true,
+            email: true,
             accessRights: true,
         },
     });
