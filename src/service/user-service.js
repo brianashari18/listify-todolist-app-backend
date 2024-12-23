@@ -11,6 +11,7 @@ import {v4 as uuid} from "uuid";
 import 'dotenv/config'
 import {logger} from "../application/logging.js";
 import nodemailer from "nodemailer";
+import {request} from "express";
 
 const register = async (request) => {
     const user = validate(registerUserValidation, request);
@@ -262,5 +263,6 @@ const logout = async (id) => {
         }
     })
 }
+
 
 export default { register ,login, forgotPassword, resetPassword, get, logout,changePassword,changeUsername, validateOtp }
