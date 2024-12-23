@@ -2,6 +2,7 @@ import {validate} from "../validation/validation.js";
 import {createTaskValidation, updateTaskValidation} from "../validation/task-validation.js";
 import {prismaClient} from "../application/database.js";
 import {ResponseError} from "../error/response-error.js";
+import {logger} from "../application/logging.js";
 
 const create = async (user, request) => {
     const tasks = validate(createTaskValidation, request)
@@ -42,9 +43,16 @@ const addUser = async (request) => {
         {
             where: {
                 id: taskId,
+            },
+            select: {
+                createdBy: true
             }
         }
     )
+
+    if (!task) {
+        throw new ResponseError(404, "Task not found");
+    }
 
     if (task.createdBy === user.id) {
         throw new ResponseError(400, "user is an owner");
@@ -192,11 +200,24 @@ const removeUser = async (request) => {
         throw new ResponseError(404, "User not found");
     }
 
+    const userAccess = await prismaClient.userWorkspace.findUnique({
+        where: {
+            email_taskId: {
+                taskId: taskId,
+                email : request.body.email,
+            }
+        }
+    })
+
+    if (!userAccess) {
+        throw new ResponseError(404, "User does not has access");
+    }
+
     await prismaClient.userWorkspace.delete({
         where: {
             email_taskId: {
                 taskId: taskId,
-                email : user.email
+                email : request.body.email
             }
         }
     })
