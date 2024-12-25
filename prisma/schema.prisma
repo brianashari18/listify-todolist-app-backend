@@ -62,3 +62,15 @@ model UserWorkspace {
   @@id([email, taskId])
   @@map("userworkspace")
 }
+
+model Trash {
+  id        Int      @id @default(autoincrement())
+  taskId    Int
+  subTaskId Int
+  taskData  String   @db.VarChar(255)
+  deadline  DateTime
+  status    String   @db.VarChar(50)
+  deletedAt DateTime @default(now())
+
+  @@map("trash")
+}

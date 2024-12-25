@@ -251,6 +251,51 @@ const getUserWithAccess = async (request) => {
     return workspace;
 }
 
+const getPeopleAccessByTrashId = async (request) => {
+    const trashId = parseInt(request.params.trashId);
+
+    // Ambil taskId dari Trash
+    const trashData = await prismaClient.trash.findUnique({
+        where: { id: trashId },
+        select: { taskId: true },
+    });
+
+    if (!trashData) {
+        throw new ResponseError(404, "Trash not found");
+    }
+
+    const workspace = await prismaClient.userWorkspace.findMany({
+        where :{
+            taskId : trashData.taskId
+        },select : {
+            email : true,
+            accessRights :true,
+        }
+    })
+    const createdBy = await prismaClient.task.findUnique({
+        where: {
+            id : trashData.taskId
+        },select : {
+            createdBy: true
+        }
+    })
+    workspace.push( await prismaClient.user.findUnique({
+        where: {
+            id : createdBy.createdBy
+        },select : {
+            email : true,
+        }
+    }))
+
+    if (workspace.length === 0) {
+        throw new ResponseError(404, "No access data found for this Task");
+    }
+
+    return workspace;
+};
+
+
+
 export default {
-    create, addUser , update, get, deleteTaskWorkspace, removeUser, getUserWithAccess
+    create, addUser , update, get, deleteTaskWorkspace, removeUser, getUserWithAccess, getPeopleAccessByTrashId
 }

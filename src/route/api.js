@@ -29,6 +29,9 @@ userRouter.get('/api/tasks/:taskId/subtask', subTaskController.get);
 userRouter.get('/api/users/subtask/', subTaskController.getByName)
 userRouter.patch('/api/tasks/:taskId/:subTaskId', subTaskController.update);
 userRouter.delete('/api/tasks/:taskId/:subTaskId', subTaskController.deleteSubTask);
+userRouter.post('/api/trash/:subTaskId/restore', subTaskController.restoreSubTask);
+userRouter.delete('/api/trash/:subTaskId', subTaskController.deletePermanently);
+userRouter.get('/api/trash', subTaskController.getTrash);
 
 //workspace
 userRouter.post('/api/workspace/tasks', workspaceController.create);
@@ -38,6 +41,7 @@ userRouter.patch('/api/workspace/:userId/tasks/:taskId',workspaceController.upda
 userRouter.delete('/api/workspace/:userId/tasks/:taskId', workspaceController.deleteTaskWorkspace);
 userRouter.delete('/api/workspace/:userId/tasks/:taskId/remove', workspaceController.removeUser);
 userRouter.get('/api/workspace/:userId/tasks/:taskId', workspaceController.getUserWithAccess);
+userRouter.get('/api/workspace/:trashId/access', workspaceController.getPeopleAccessByTrashId);
 
 //feedback
 userRouter.post('/api/users/:userId/feedback', feedbackController.sendFeedback);

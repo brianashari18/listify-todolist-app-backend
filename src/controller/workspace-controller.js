@@ -83,6 +83,17 @@ const getUserWithAccess = async (req,res, next) => {
     }
 }
 
+const getPeopleAccessByTrashId = async (req,res, next) => {
+    try {
+        const result = await workspaceService.getPeopleAccessByTrashId(req);
+        res.status(200).json({
+            data: result,
+        });
+    }catch (e){
+        next(e);
+    }
+}
+
 export default {
-    create,addUser,update, get, deleteTaskWorkspace, removeUser, getUserWithAccess
+    create,addUser,update, get, deleteTaskWorkspace, removeUser, getUserWithAccess, getPeopleAccessByTrashId
 }
