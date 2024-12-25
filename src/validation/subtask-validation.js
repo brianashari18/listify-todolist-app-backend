@@ -12,6 +12,7 @@ const updateSubTaskValidation = Joi.object({
     status: Joi.string().optional(),
 })
 
+
 export {
     createSubTaskValidation,updateSubTaskValidation
 };
