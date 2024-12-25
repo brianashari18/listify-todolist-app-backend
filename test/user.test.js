@@ -1,5 +1,4 @@
-import {prismaClient} from "../src/application/database.js";
-import bcrypt from "bcrypt";
+
 import {createTestUser, removeTestUser} from "./test-util.js";
 import supertest from "supertest";
 import {app} from "../src/application/app.js";
@@ -177,4 +176,108 @@ describe('User API Unit Tests', () => {
             expect(response.body.errors).toBeDefined();
         });
     });
+
+    describe('PATCH /api/users/current (Change Password)', () => {
+        it('should successfully change the user password', async () => {
+            const loginResponse = await supertest(app)
+                .post('/api/users/login')
+                .send({
+                    email: 'test@test.com',
+                    password: 'test123456'
+                });
+
+            const token = loginResponse.body.data.token;
+
+            const response = await supertest(app)
+                .patch('/api/users/current')
+                .set('Authorization', `${token}`)
+                .send({
+                    password: 'newPassword',
+                    confirmPassword: 'newPassword'
+                });
+
+            expect(response.status).toBe(200);
+            expect(response.body.message).toBe('OK');
+        });
+
+        it('should fail if passwords do not match', async () => {
+            const loginResponse = await supertest(app)
+                .post('/api/users/login')
+                .send({
+                    email: 'test@test.com',
+                    password: 'test123456'
+                });
+
+            const token = loginResponse.body.data.token;
+
+            const response = await supertest(app)
+                .patch('/api/users/current')
+                .set('Authorization', `${token}`)
+                .send({
+                    password: 'newPassword1',
+                    confirmPassword: 'newPassword2'
+                });
+
+            expect(response.status).toBe(404);
+            expect(response.body.errors).toBeDefined();
+        });
+
+        it('should fail for unauthorized user', async () => {
+            const response = await supertest(app)
+                .patch('/api/users/current')
+                .send({
+                    password: 'newPassword',
+                    confirmPassword: 'newPassword'
+                });
+
+            expect(response.status).toBe(401);
+            expect(response.body.errors).toBeDefined();
+        });
+    });
+
+    describe('PATCH /api/users/current/userId (Change Username)', () => {
+        it('should successfully change the username', async () => {
+            const loginResponse = await supertest(app)
+                .post('/api/users/login')
+                .send({
+                    email: 'test@test.com',
+                    password: 'test123456'
+                });
+
+            const token = loginResponse.body.data.token;
+
+            const response = await supertest(app)
+                .patch('/api/users/current/userId')
+                .set('Authorization', `${token}`)
+                .send({
+                    username: 'newUsername'
+                });
+
+            expect(response.status).toBe(200);
+            expect(response.body.message).toBe('OK');
+            expect(response.body.data.username).toBe('newUsername');
+        });
+
+        it('should fail if username is invalid', async () => {
+            const loginResponse = await supertest(app)
+                .post('/api/users/login')
+                .send({
+                    email: 'test@test.com',
+                    password: 'test123456'
+                });
+
+            const token = loginResponse.body.data.token;
+
+            const response = await supertest(app)
+                .patch('/api/users/current/userId')
+                .set('Authorization', `${token}`)
+                .send({
+                    username: '' // Invalid username
+                });
+
+            expect(response.status).toBe(400);
+            expect(response.body.errors).toBeDefined();
+        });
+    });
+
 });

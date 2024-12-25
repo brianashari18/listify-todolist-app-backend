@@ -208,6 +208,13 @@ const get = async (id) => {
 
 const changeUsername = async (user,req) => {
 
+    let username = req.body.username
+    if(username.length === 0){
+        throw new ResponseError(400 , "Username Cannot be empty")
+    }else if (username.length >= 50){
+        throw new ResponseError(400, "Username Too Long")
+    }
+
     return  prismaClient.user.update({
         where:{
             id: user.id,
