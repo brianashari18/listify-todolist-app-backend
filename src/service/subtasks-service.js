@@ -64,9 +64,8 @@ const getByName = async (request) => {
 
     const subtask = await prismaClient.subTask.findMany({
         where: {
-            name: {
-                contains: search,
-                mode: 'insensitive'
+            taskData: {
+                contains: search
             },
         }
     })
