@@ -1,0 +1,46 @@
+### Add SubTask
+POST http://localhost:8080/api/tasks/25/subtask
+Authorization: 3dfff5c4-c295-472f-8c1b-9d97790cbd20
+Content-Type: application/json
+
+{
+  "taskData": "Test SubTask",
+  "deadline": "2024-12-12",
+  "status": "On Progress"
+}
+
+### Get SubTasks by Task ID
+GET http://localhost:8080/api/tasks/25/subtask
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+
+### Get SubTasks by Name
+GET http://localhost:8080/api/users/subtask?search=subtask
+Authorization: 5746b350-243b-4eaa-b2d8-5833aafbd677
+Content-Type: application/json
+
+### Update SubTask
+PATCH http://localhost:8080/api/tasks/25/99
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+Content-Type: application/json
+
+{
+  "taskData": "Updated Task Data",
+  "deadline": "2024-12-20",
+  "status": "On Progress"
+}
+
+### Delete SubTask (Move to Trash)
+DELETE http://localhost:8080/api/tasks/25/25
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+
+### Restore SubTask from Trash
+POST http://localhost:8080/api/trash/25/restore
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+
+### Delete SubTask Permanently from Trash
+DELETE http://localhost:8080/api/trash/5
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+
+### Get Trash
+GET http://localhost:8080/api/trash
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b

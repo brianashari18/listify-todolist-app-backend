@@ -60,23 +60,40 @@ const get = async (request) => {
 }
 
 const getByName = async (request) => {
-    const search = request.body.search;
+    const search = request.query.search;
 
     const subtask = await prismaClient.subTask.findMany({
         where: {
-            name: {
+            OR: [
+                {
+                    task: {
+                        createdBy: request.user.id,
+                    },
+                },
+                {
+                    task: {
+                        userWorkspaces: {
+                            some: {
+                                email: request.user.email,
+                            },
+                        },
+                    },
+                },
+            ],
+            taskData: {
                 contains: search,
-                mode: 'insensitive'
             },
         }
-    })
+    });
 
-    if (subtask.length === 0) {
+    if (!subtask.length) {
         throw new ResponseError(404, "subTask not found");
     }
 
     return subtask;
-}
+};
+
+
 
 const update = async (request) => {
     const newData = validate(updateSubTaskValidation,request.body);

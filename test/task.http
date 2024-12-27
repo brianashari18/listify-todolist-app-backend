@@ -1,0 +1,23 @@
+### Find All Tasks
+GET http://localhost:8080/api/users/1/tasks
+Authorization: 57b860e5-0d3b-49ff-9097-2d55caee0f16
+
+### Add Task
+POST http://localhost:8080/api/tasks
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+Content-Type: application/json
+
+{
+  "name": "test",
+  "color": "test"
+}
+
+### Edit Task
+PATCH http://localhost:8080/api/users/1/tasks/3
+Authorization: 0d4eeb29-58ae-4052-b51e-dc670109ee84
+Content-Type: application/json
+
+{
+  "name": "test",
+  "color": "test"
+}

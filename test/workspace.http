@@ -1,0 +1,53 @@
+### Create Workspace
+POST http://localhost:8080/api/workspace/tasks
+Content-Type: application/json
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+
+{
+  "name": "testws",
+  "color": "testws"
+}
+
+### Add User
+POST http://localhost:8080/api/workspace/1
+Content-Type: application/json
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+
+{
+  "email": "test2@example.com",
+  "accessRights": 1
+}
+
+### Get Workspace
+GET http://localhost:8080/api/workspace/1/tasks
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+
+### Update Workspace
+PATCH http://localhost:8080/api/workspace/10/tasks/20
+Content-Type: application/json
+Authorization: 8598ff4c-020c-4c24-a241-8b66decb0844
+
+{
+  "name": "testws",
+  "color": "testws"
+}
+
+### Get People Access
+GET http://localhost:8080/api/workspace/1/tasks/1
+Content-Type: application/json
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+
+### Get People Access by Subtask id
+GET http://localhost:8080/api/workspace/10/access
+Content-Type: application/json
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+
+### Delete People Access
+DELETE http://localhost:8080/api/workspace/1/tasks/1/remove
+Content-Type: application/json
+Authorization: 5d28e0b2-32b2-4778-82b2-c48e2668228b
+
+{
+  "email": "test2@example.com"
+}
+
