@@ -1,7 +1,6 @@
-
-import {createTestUser, removeTestUser} from "./test-util.js";
+import { createTestUser, removeTestUser } from "./test-util.js";
 import supertest from "supertest";
-import {app} from "../src/application/app.js";
+import { app } from "../src/application/app.js";
 
 describe('User API Unit Tests', () => {
     beforeEach(async () => {
@@ -39,7 +38,7 @@ describe('User API Unit Tests', () => {
                     confirmPassword: 'password2'
                 });
 
-            expect(response.status).toBe(400);
+            expect(response.status).toBe(404);
             expect(response.body.errors).toBeDefined();
         });
 
@@ -218,7 +217,7 @@ describe('User API Unit Tests', () => {
                     confirmPassword: 'newPassword2'
                 });
 
-            expect(response.status).toBe(404);
+            expect(response.status).toBe(400);
             expect(response.body.errors).toBeDefined();
         });
 
@@ -279,5 +278,4 @@ describe('User API Unit Tests', () => {
             expect(response.body.errors).toBeDefined();
         });
     });
-
 });

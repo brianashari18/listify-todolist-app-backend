@@ -8,7 +8,7 @@ const createSubTaskValidation = Joi.object({
 
 const updateSubTaskValidation = Joi.object({
     taskData: Joi.string().max(255).required(),
-    deadline: Joi.date().iso().required(),
+    deadline: Joi.date().iso().optional(),
     status: Joi.string().optional(),
 })
 

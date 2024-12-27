@@ -26,7 +26,7 @@ userRouter.post('/api/tasks/:taskId', taskController.addTaskToWorkspace);
 //subtask
 userRouter.post('/api/tasks/:taskId/subtask', subTaskController.create);
 userRouter.get('/api/tasks/:taskId/subtask', subTaskController.get);
-userRouter.get('/api/users/subtask/', subTaskController.getByName)
+userRouter.get('/api/users/subtask', subTaskController.getByName)
 userRouter.patch('/api/tasks/:taskId/:subTaskId', subTaskController.update);
 userRouter.delete('/api/tasks/:taskId/:subTaskId', subTaskController.deleteSubTask);
 userRouter.post('/api/trash/:subTaskId/restore', subTaskController.restoreSubTask);

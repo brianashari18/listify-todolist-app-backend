@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 export const removeTestUser = async () => {
     await prismaClient.userWorkspace.deleteMany({});
     await prismaClient.task.deleteMany({});
+    await prismaClient.subTask.deleteMany({});
+    await prismaClient.trash.deleteMany({});
     await prismaClient.user.deleteMany({
         where: {
             username: { in: ['test', 'test2'] },
@@ -61,6 +63,7 @@ export const createTestTask = async (userId, name = 'Test Task', color = 'blue',
 
 export const removeTestTasks = async () => {
     await prismaClient.task.deleteMany({});
+    await prismaClient.trash.deleteMany({});
 };
 
 export const createTestSubtask = async (taskId) => {
@@ -78,6 +81,7 @@ export const createTestSubtask = async (taskId) => {
 
 export const removeTestSubtasks = async () => {
     await prismaClient.subTask.deleteMany({});
+    await prismaClient.trash.deleteMany({});
 };
 
 export const addUserToWorkspace = async (email, taskId, accessRights = 1) => {
@@ -95,3 +99,4 @@ export const addUserToWorkspace = async (email, taskId, accessRights = 1) => {
 export const removeWorkspaceUsers = async () => {
     await prismaClient.userWorkspace.deleteMany({});
 };
+
